@@ -8,6 +8,8 @@
 <body>
     <h1>Add Product</h1>
     <form action="/produk/create" method="post">
+        <label for="id">Id:</label>
+        <input type="text" name="id" required><br>
         <label for="nama">Name:</label>
         <input type="text" name="nama" required><br>
         <label for="harga">Price:</label>

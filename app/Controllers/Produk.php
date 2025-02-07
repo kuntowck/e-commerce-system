@@ -23,11 +23,8 @@ class Produk extends BaseController
     public function detail($id)
     {
         $product = $this->produkModel->getProductById($id);
-        if ($product) {
-            return view('produk/detail', ['product' => $product]);
-        } else {
-            return redirect()->to('/produk');
-        }
+        
+        return view('produk/detail', ['product' => $product]);
     }
 
     public function create()
@@ -43,26 +40,21 @@ class Produk extends BaseController
         $kategori = $this->request->getPost('kategori');
         $stok = $this->request->getPost('stok');
 
-        $produk = new ProdukEntity($id, $nama, $harga, $kategori, $stok);
+        $produk = new ProdukEntity($id, $nama, $harga, $stok, $kategori);
         $this->produkModel->addProduct($produk);
 
         return redirect()->to('/produk');
     }
 
-    public function update($id)
+    public function update()
     {
-        $product = $this->produkModel->getProductById($id);
-        if (!$product) {
-            return redirect()->to('/mahasiswa');
-        }
-
         $id = $this->request->getPost('id');
-        $nama = $this->request->getPost('name');
-        $harga = $this->request->getPost('price');
-        $kategori = $this->request->getPost('category');
-        $stok = $this->request->getPost('stock');
+        $nama = $this->request->getPost('nama');
+        $harga = $this->request->getPost('harga');
+        $kategori = $this->request->getPost('kategori');
+        $stok = $this->request->getPost('stok');
 
-        $updatedProduct = new ProdukEntity($id, $nama, $harga, $kategori, $stok);
+        $updatedProduct = new ProdukEntity($id, $nama, $harga, $stok, $kategori);
         $this->produkModel->updateProduct($updatedProduct);
 
         return redirect()->to('/produk');

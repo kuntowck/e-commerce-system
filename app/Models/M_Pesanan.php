@@ -7,14 +7,19 @@ use App\Entities\Pesanan;
 class M_Pesanan
 {
     private $orders = [];
+    private $session;
 
     public function __construct()
     {
-        $this->orders = [
-            new Pesanan(1, 'Pending'),
-            new Pesanan(2, 'Completed'),
-        ];
+        $this->session = session();
+        $this->orders = $this->session->get('pesanan') ?? [];
     }
+
+    private function saveData()
+    {
+        $this->session->set('pesanan', $this->orders);
+    }
+
 
     public function getAllOrders()
     {
@@ -31,50 +36,46 @@ class M_Pesanan
         return null;
     }
 
-    public function addOrder(Pesanan $order)
+    public function addOrder(Pesanan $pesanan)
     {
-        $this->orders[] = $order;
+        $this->orders[] = $pesanan;
+        $this->saveData();
+
         return true;
     }
 
-    public function updateStatus(Pesanan $order, $status)
+    public function updateStatus(Pesanan $pesanan)
     {
-        foreach ($this->orders as $key => $existingOrder) {
-            if ($existingOrder->getId() === $order->getId()) {
-                $existingOrder->setStatus($status);
+        foreach ($this->orders as $key => $order) {
+            if ($order->getId() === $pesanan->getId()) {
+                $this->orders[$key] = $pesanan;
+                $this->saveData();
+
                 return true;
             }
         }
         return false;
     }
 
-    public function addItem(Pesanan $pesanan, $item)
+    public function deleteOrder($id)
     {
-        $produk = $pesanan->getProduk();
-        $produk[] = $item;
-        $pesanan->setProduk($produk);
-        $this->calculateTotal($pesanan);
-    }
+        foreach ($this->orders as $key => $order) {
+            if ($order->getId() == $id) {
+                unset($this->orders[$key]);
 
-    public function removeProduct(Pesanan $pesanan, $produkId)
-    {
-        $produk = $pesanan->getProduk();
-        foreach ($produk as $key => $item) {
-            if ($item['id'] == $produkId) {
-                unset($produk[$key]);
-                break;
+                return true;
             }
         }
-        $pesanan->setProduk($produk);
-        $this->calculateTotal($pesanan);
+
+        return false;
     }
 
-    public function calculateTotal(Pesanan $pesanan)
-    {
-        $total = 0;
-        foreach ($pesanan->getProduk() as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-        $pesanan->setTotal($total);
-    }
+    // public function calculateTotal(Pesanan $pesanan)
+    // {
+    //     $total = 0;
+    //     foreach ($pesanan->getProduk() as $item) {
+    //         $total += $item['price'] * $item['quantity'];
+    //     }
+    //     $pesanan->setTotal($total);
+    // }
 }

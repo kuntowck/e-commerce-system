@@ -7,13 +7,21 @@ use App\Entities\Produk;
 class M_Produk
 {
     private $products = [];
+    private $session;
 
     public function __construct()
     {
-        $this->products = [
-            new Produk(1, 'Sepatu Bola', 600000, 10, 'Sepatu'),
-            new Produk(2, 'Sepatu Running', 800000, 20, 'Sepatu'),
-        ];
+        $this->session = session();
+        $this->products = $this->session->get('produk') ?? [];
+        // $this->products = [
+        //     new Produk(1, 'Sepatu Bola', 600000, 10, 'Sepatu'),
+        //     new Produk(2, 'Sepatu Running', 800000, 20, 'Sepatu'),
+        // ];
+    }
+
+    private function saveData()
+    {
+        $this->session->set('produk', $this->products);
     }
 
     public function getAllProducts()
@@ -34,15 +42,17 @@ class M_Produk
     public function addProduct(Produk $produk)
     {
         $this->products[] = $produk;
+        $this->saveData();
 
         return true;
     }
 
     public function updateProduct(Produk $produk)
     {
-        foreach ($this->products as $product) {
+        foreach ($this->products as $key => $product) {
             if ($product->getId() === $produk->getId()) {
-                $product = $produk;
+                $this->products[$key] = $produk;
+                $this->saveData();
 
                 return true;
             }
@@ -56,6 +66,7 @@ class M_Produk
         foreach ($this->products as $key => $product) {
             if ($product->getId() === $id) {
                 unset($this->products[$key]);
+                $this->saveData();
 
                 return true;
             }

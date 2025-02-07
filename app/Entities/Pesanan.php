@@ -6,9 +6,11 @@ class Pesanan
 {
     private $id, $produk = [], $total = 0, $status;
 
-    public function __construct($id, $status)
+    public function __construct($id, $produk, $total, $status)
     {
         $this->id = $id;
+        $this->produk = $produk;
+        $this->total = $total;
         $this->status = $status;
     }
 

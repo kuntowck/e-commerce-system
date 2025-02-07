@@ -3,65 +3,74 @@
 namespace App\Controllers;
 
 use App\Models\M_Pesanan;
+use App\Models\M_Produk;
 use App\Entities\Pesanan as PesananEntity;
-use CodeIgniter\Controller;
 
-class Pesanan extends Controller
+class Pesanan extends BaseController
 {
     protected $pesananModel;
+    protected $produkModel;
 
     public function __construct()
     {
         $this->pesananModel = new M_Pesanan();
+        $this->produkModel = new M_Produk();
     }
 
     public function index()
     {
-        $data['pesanan'] = $this->pesananModel->getAllOrders();
-        return view('pesanan/index', $data);
+        $orders = $this->pesananModel->getAllOrders();
+        return view('pesanan/index', ['orders' => $orders]);
     }
 
     public function detail($id)
     {
         $order = $this->pesananModel->getOrderById($id);
-        if ($order) {
-            return view('pesanan/detail', ['order' => $order]);
-        } else {
-            return redirect()->to('/pesanan');
-        }
-    }
 
+        return view('pesanan/detail', ['order' => $order]);
+    }
+    
     public function create()
     {
-        if ($this->request->getMethod() === 'post') {
-            $status = $this->request->getPost('status');
-            $pesanan = new PesananEntity(null, $status);
-            $this->pesananModel->addOrder($pesanan);
-
-            return redirect()->to('/pesanan');
-        }
-
-        return view('pesanan/create');
+        $produk = $this->produkModel->getAllProducts();
+        return view('pesanan/create', ['produk' => $produk]);
     }
 
-    public function updateStatus($id)
+    public function store()
     {
-        if ($this->request->getMethod() === 'post') {
-            $status = $this->request->getPost('status');
-            $order = $this->pesananModel->getOrderById($id);
-            if ($order) {
-                $this->pesananModel->updateStatus($order, $status);
-                return redirect()->to('/pesanan');
-            } else {
-                return redirect()->to('/pesanan');
-            }
-        }
+        $id = $this->request->getPost('id');
+        $produk = $this->request->getPost('produk');
+        $total = $this->request->getPost('total');
+        $status = $this->request->getPost('status');
 
+        $orders = new PesananEntity($id, $produk, $total, $status);
+        $this->pesananModel->addOrder($orders);
+
+        return redirect()->to('/pesanan');
+    }
+
+    public function updateStatus()
+    {
+        $id = $this->request->getPost('id');
+        $produk = $this->request->getPost('produk');
+        $total = $this->request->getPost('total');
+        $status = $this->request->getPost('status');
+
+        $updatedOrder = new PesananEntity($id, $produk, $total, $status);
+        $this->pesananModel->updateStatus($updatedOrder);
+
+        return redirect()->to('/pesanan');
+    }
+
+    public function editStatus($id)
+    {
         $order = $this->pesananModel->getOrderById($id);
-        if ($order) {
-            return view('pesanan/update_status', ['order' => $order]);
-        } else {
-            return redirect()->to('/pesanan');
-        }
+        return view('pesanan/update', ["order" => $order]);
+    }
+
+    public function delete($id)
+    {
+        $this->pesananModel->deleteOrder($id);
+        return redirect()->to('/pesanan');
     }
 }
