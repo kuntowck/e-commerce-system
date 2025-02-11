@@ -15,7 +15,7 @@ $routes->get('/produk/create', [Produk::class, 'create']);
 $routes->post('/produk/create', [Produk::class, 'store']);
 $routes->get('/produk/edit/(:num)', [Produk::class, 'edit']);
 $routes->put('/produk/update', [Produk::class, 'update']);
-$routes->get('/produk/delete/(:num)', [Produk::class, 'delete/$1']);
+$routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1']);
 
 $routes->get('/pesanan', [Pesanan::class, 'index']);
 $routes->get('/pesanan/detail/(:num)', [Pesanan::class, 'detail/$1']);
