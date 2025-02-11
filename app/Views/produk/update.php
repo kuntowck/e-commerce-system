@@ -8,6 +8,9 @@
 <body>
     <h1>Update Product</h1>
     <form action="/produk/update" method="post">
+        <?= csrf_field(); ?>
+        <input type="hidden" name="_method" value="PUT">
+
         <label for="id">Id:</label>
         <input type="text" name="id" value="<?= $product->getId() ?>" required><br>
         <label for="nama">Name:</label>
