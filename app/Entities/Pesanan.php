@@ -4,14 +4,14 @@ namespace App\Entities;
 
 class Pesanan
 {
-    private $id, $produk = [], $total = 0, $status;
+    private $id, $produk, $total, $status, $kuantitas;
 
-    public function __construct($id, $produk, $total, $status)
+    public function __construct($id, $produk, $status, $kuantitas)
     {
         $this->id = $id;
         $this->produk = $produk;
-        $this->total = $total;
         $this->status = $status;
+        $this->kuantitas = $kuantitas;
     }
 
     public function getId()
@@ -47,5 +47,15 @@ class Pesanan
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    public function getKuantitas()
+    {
+        return $this->kuantitas;
+    }
+
+    public function setKuantitas($kuantitas)
+    {
+        $this->kuantitas = $kuantitas;
     }
 }

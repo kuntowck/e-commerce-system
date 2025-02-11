@@ -62,6 +62,7 @@ class M_Pesanan
         foreach ($this->orders as $key => $order) {
             if ($order->getId() == $id) {
                 unset($this->orders[$key]);
+                $this->saveData();
 
                 return true;
             }
@@ -70,12 +71,12 @@ class M_Pesanan
         return false;
     }
 
-    // public function calculateTotal(Pesanan $pesanan)
-    // {
-    //     $total = 0;
-    //     foreach ($pesanan->getProduk() as $item) {
-    //         $total += $item['price'] * $item['quantity'];
-    //     }
-    //     $pesanan->setTotal($total);
-    // }
+    public function calculateTotal(Pesanan $pesanan)
+    {
+        $total = 0;
+        foreach ($pesanan->getProduk() as $item) {
+            $total += $item['harga'] * $pesanan->getKuantitas();
+        }
+        $pesanan->setTotal($total);
+    }
 }

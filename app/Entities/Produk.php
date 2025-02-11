@@ -50,6 +50,20 @@ class Produk
         $this->stok = $stok;
     }
 
+    public function kurangiStok($jumlah)
+    {
+        if ($this->stok < 0) {
+            $this->stok -= $jumlah;
+        } else {
+            $this->stok = 0;
+        }
+    }
+
+    public function tambahStok($jumlah)
+    {
+        $this->stok += $jumlah;
+    }
+
     public function getKategori()
     {
         return $this->kategori;

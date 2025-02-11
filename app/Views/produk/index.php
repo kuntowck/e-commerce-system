@@ -26,9 +26,9 @@
                 <td><?= $product->getKategori() ?></td>
                 <td><?= $product->getStok() ?></td>
                 <td>
-                    <a href="/produk/detail/<?= $product->getId() ?>">Detail< /a>
-                    <a href="/produk/edit/<?= $product->getId() ?>">Edit</a>
-                    <a href="/produk/delete/<?= $product->getId() ?>">Delete</a>
+                    <a href="/produk/detail/<?= $product->getId() ?>">Detail</a>
+                            <a href="/produk/edit/<?= $product->getId() ?>">Edit</a>
+                            <a href="/produk/delete/<?= $product->getId() ?>">Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>

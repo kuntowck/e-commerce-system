@@ -18,13 +18,16 @@
         </tr>
         <?php foreach ($orders as $order): ?>
             <tr>
+
                 <td><?= $order->getId() ?></td>
-                <td><?= $order->getProduk() ?></td>
-                <td><?= $order->getTotal() ?></td>
+                <?php foreach ($order->getProduk() as $produk): ?>
+                    <td><?= $produk->nama ?> | Rp<?= $produk->harga ?></td><br>
+                    <td>Rp<?= $produk->harga * $order->getKuantitas() ?></td>
+                <?php endforeach; ?>
                 <td><?= $order->getStatus() ?></td>
                 <td>
                     <a href="/pesanan/detail/<?= $order->getId() ?>">Detail</a>
-                    <a href="/pesanan/update_status/<?= $order->getId() ?>">Update Status</a>
+                    <a href="/pesanan/update/<?= $order->getId() ?>">Update Status</a>
                     <a href="/pesanan/delete/<?= $order->getId() ?>">Delete</a>
                 </td>
             </tr>

@@ -20,6 +20,7 @@ class Pesanan extends BaseController
     public function index()
     {
         $orders = $this->pesananModel->getAllOrders();
+
         return view('pesanan/index', ['orders' => $orders]);
     }
 
@@ -29,21 +30,29 @@ class Pesanan extends BaseController
 
         return view('pesanan/detail', ['order' => $order]);
     }
-    
+
     public function create()
     {
         $produk = $this->produkModel->getAllProducts();
+
         return view('pesanan/create', ['produk' => $produk]);
     }
 
     public function store()
     {
         $id = $this->request->getPost('id');
-        $produk = $this->request->getPost('produk');
-        $total = $this->request->getPost('total');
+        $products = json_decode($this->request->getPost('selectedProducts'));
         $status = $this->request->getPost('status');
+        $kuantitas = $this->request->getPost('kuantitas');
 
-        $orders = new PesananEntity($id, $produk, $total, $status);
+        $orders = new PesananEntity($id, $products, $status, $kuantitas);
+
+
+        echo "<pre>";
+        var_dump($orders);
+        echo "</pre>";
+        // die();
+        // $this->pesananModel->calculateTotal($orders);
         $this->pesananModel->addOrder($orders);
 
         return redirect()->to('/pesanan');
@@ -53,10 +62,16 @@ class Pesanan extends BaseController
     {
         $id = $this->request->getPost('id');
         $produk = $this->request->getPost('produk');
-        $total = $this->request->getPost('total');
         $status = $this->request->getPost('status');
+        $kuantitas = $this->request->getPost('kuantitas');
 
-        $updatedOrder = new PesananEntity($id, $produk, $total, $status);
+        $updatedOrder = new PesananEntity($id, $produk, $status, $kuantitas);
+
+        echo "<pre>";
+        var_dump($updatedOrder);
+        echo "</pre>";
+        die();
+
         $this->pesananModel->updateStatus($updatedOrder);
 
         return redirect()->to('/pesanan');
@@ -65,12 +80,19 @@ class Pesanan extends BaseController
     public function editStatus($id)
     {
         $order = $this->pesananModel->getOrderById($id);
+
         return view('pesanan/update', ["order" => $order]);
     }
 
     public function delete($id)
     {
+        echo "<pre>";
+        var_dump($id);
+        echo "</pre>";
+        // die();
+
         $this->pesananModel->deleteOrder($id);
+
         return redirect()->to('/pesanan');
     }
 }
