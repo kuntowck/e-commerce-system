@@ -9,10 +9,21 @@ use App\Controllers\Pesanan;
  */
 $routes->get('/', 'Home::index');
 
-$routes->get('/produk', [Produk::class, 'index']);
+// $routes->resource('Products');
+
+$routes->group('/admin', function ($routes) {
+    $routes->get('user', 'admin\user::index');
+    $routes->get('user/profile/', 'admin\user::profile/', ['as' => 'profile']);
+    $routes->addRedirect('user/about', 'profile');
+    $routes->get('product', 'admin\product::index');
+    $routes->get('order', 'admin\order::index');
+});
+
+$routes->get('/produk', [Produk::class, 'index/$1/$2']);
 $routes->get('/produk/detail/(:num)', [Produk::class, 'detail/$1']);
 $routes->get('/produk/create', [Produk::class, 'create']);
-$routes->post('/produk/create', [Produk::class, 'store']);
+// $routes->match(['get', 'post'], '/produk', [Produk::class, 'features']);
+$routes->post('/produk', [Produk::class, 'store']);
 $routes->get('/produk/edit/(:num)', [Produk::class, 'edit']);
 $routes->put('/produk/update', [Produk::class, 'update']);
 $routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1']);

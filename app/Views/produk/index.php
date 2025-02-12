@@ -33,6 +33,7 @@
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" onclick="return confirm('Are you sure?')">Hapus</button>
                     </form>
+                    <a href="<?= url_to('profile') ?>">view profile</a>
                 </td>
             </tr>
         <?php endforeach; ?>

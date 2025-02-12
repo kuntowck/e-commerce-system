@@ -6,13 +6,13 @@ class Produk
 {
     private $id, $nama, $harga, $stok, $kategori;
 
-    public function __construct($id, $nama, $harga, $stok, $kategori)
+    public function __construct(array $data)
     {
-        $this->id = $id;
-        $this->nama = $nama;
-        $this->harga = $harga;
-        $this->stok = $stok;
-        $this->kategori = $kategori;
+        $this->id = $data['id'] ?? '';
+        $this->nama = $data['nama'] ?? '';
+        $this->harga = $data['harga'] ?? '';
+        $this->stok = $data['stok'] ?? '';
+        $this->kategori = $data['kategori'] ?? '';
     }
 
     public function getId()
