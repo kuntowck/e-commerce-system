@@ -29,3 +29,7 @@ $routes->post('/pesanan/create', [Pesanan::class, 'store']);
 $routes->get('/pesanan/update/(:num)', [Pesanan::class, 'editStatus/$1']);
 $routes->post('/pesanan/update/', [Pesanan::class, 'updateStatus']);
 $routes->delete('/pesanan/delete/(:num)', [Pesanan::class, 'delete/$1']);
+
+$routes->get('/user/profile/(:num)', [User::class, 'profile/$1']);
+$routes->get('/user/settings/(:alpha)', [User::class, 'settings/$1']);
+$routes->get('/user/role/(:alphanum)', [User::class, 'role/$1']);
