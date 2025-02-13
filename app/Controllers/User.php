@@ -4,6 +4,11 @@ namespace App\Controllers;
 
 class User extends BaseController
 {
+    public function index()
+    {
+        return view('user/dashboard');
+    }
+
     public function profile($id)
     {
         return view('user/profile', ['data' => $id]);
