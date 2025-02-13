@@ -4,6 +4,8 @@ use CodeIgniter\Router\RouteCollection;
 use App\Controllers\Produk;
 use App\Controllers\Pesanan;
 use App\Controllers\User;
+use App\Controllers\Admin;
+use App\Controllers\Api;
 
 /**
  * @var RouteCollection $routes
@@ -34,3 +36,13 @@ $routes->get('/user/dashboard', [User::class, 'index'], ['as' => 'user_dashboard
 $routes->get('/user/profile/(:num)', [User::class, 'profile/$1']);
 $routes->get('/user/settings/(:alpha)', [User::class, 'settings/$1']);
 $routes->get('/user/role/(:alphanum)', [User::class, 'role/$1']);
+
+$routes->group('admin', function ($routes) {
+    $routes->get('dashboard', [Admin::class, 'dashboard']);
+    $routes->get('users', [Admin::class, 'users']);
+});
+
+$routes->group('api', function ($routes) {
+    $routes->get('users', [Api::class, 'users']);
+    $routes->get('products', [Api::class, 'products']);
+});
