@@ -6,12 +6,12 @@ class Pesanan
 {
     private $id, $produk, $total, $status, $kuantitas;
 
-    public function __construct($id, $produk, $status, $kuantitas)
+    public function __construct(array $data)
     {
-        $this->id = $id;
-        $this->produk = $produk;
-        $this->status = $status;
-        $this->kuantitas = $kuantitas;
+        $this->id = $data['id'] ?? '';
+        $this->produk = $data['produk'] ?? '';
+        $this->status = $data['status'] ?? '';
+        $this->kuantitas = $data['kuantitas'] ?? '';
     }
 
     public function getId()

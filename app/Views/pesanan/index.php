@@ -28,7 +28,11 @@
                 <td>
                     <a href="/pesanan/detail/<?= $order->getId() ?>">Detail</a>
                     <a href="/pesanan/update/<?= $order->getId() ?>">Update Status</a>
-                    <a href="/pesanan/delete/<?= $order->getId() ?>">Delete</a>
+                    <form action="/pesanan/delete<?= $order->getId() ?>" method="post">
+                        <?= csrf_field(); ?>
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
                 </td>
             </tr>
         <?php endforeach; ?>

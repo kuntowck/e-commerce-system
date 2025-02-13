@@ -17,13 +17,14 @@ class Produk extends BaseController
     public function index()
     {
         $products = $this->produkModel->getAllProducts();
+
         return view('produk/index', ['products' => $products]);
     }
 
     public function detail($id)
     {
         $product = $this->produkModel->getProductById($id);
-        
+
         return view('produk/detail', ['product' => $product]);
     }
 
@@ -34,27 +35,17 @@ class Produk extends BaseController
 
     public function store()
     {
-        $id = $this->request->getPost('id');
-        $nama = $this->request->getPost('nama');
-        $harga = $this->request->getPost('harga');
-        $kategori = $this->request->getPost('kategori');
-        $stok = $this->request->getPost('stok');
-
-        $produk = new ProdukEntity($id, $nama, $harga, $stok, $kategori);
-        $this->produkModel->addProduct($produk);
+        $dataProduct = $this->request->getPost();
+        $product = new ProdukEntity($dataProduct);
+        $this->produkModel->addProduct($product);
 
         return redirect()->to('/produk');
     }
 
     public function update()
     {
-        $id = $this->request->getPost('id');
-        $nama = $this->request->getPost('nama');
-        $harga = $this->request->getPost('harga');
-        $kategori = $this->request->getPost('kategori');
-        $stok = $this->request->getPost('stok');
-
-        $updatedProduct = new ProdukEntity($id, $nama, $harga, $stok, $kategori);
+        $dataProduct = $this->request->getPost();
+        $updatedProduct = new ProdukEntity($dataProduct);
         $this->produkModel->updateProduct($updatedProduct);
 
         return redirect()->to('/produk');
@@ -63,12 +54,14 @@ class Produk extends BaseController
     public function edit($id)
     {
         $product = $this->produkModel->getProductById($id);
+        
         return view('produk/update', ["product" => $product]);
     }
 
     public function delete($id)
     {
         $this->produkModel->deleteProduct($id);
+
         return redirect()->to('/produk');
     }
 }

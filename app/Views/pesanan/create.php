@@ -26,7 +26,7 @@
         <label for="kuantitas">kuantitas</label>
         <input type="number" name="kuantitas" id="kuantitas" min="1" requrired><br>
 
-        <!-- Hidden input to store selected product details -->
+        <!-- Hidden input to store selected product -->
         <input type="hidden" name="selectedProducts" id="selectedProducts">
         <button type="submit">Create</button>
     </form>

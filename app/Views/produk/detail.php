@@ -8,12 +8,12 @@
 <body>
     <h1>Product Detail</h1>
 
-    <p><?= $product->getId() ?></p>
-    <p><?= $product->getNama() ?></p>
-    <p><?= $product->getHarga() ?></p>
-    <p><?= $product->getKategori() ?></p>
-    <p><?= $product->getStok() ?></p>
-    <a href="/mahasiswa">Kembali ke Product Catalog</a>
+    <p>ID: <?= $product->getId() ?></p>
+    <p>Nama Produk: <?= $product->getNama() ?></p>
+    <p>Harga: <?= $product->getHarga() ?></p>
+    <p>Kategori: <?= $product->getKategori() ?></p>
+    <p>Stok: <?= $product->getStok() ?></p>
+    <a href="/produk">Back to Catalog</a>
 </body>
 
 </html>

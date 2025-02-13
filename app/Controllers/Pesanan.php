@@ -40,19 +40,11 @@ class Pesanan extends BaseController
 
     public function store()
     {
-        $id = $this->request->getPost('id');
-        $products = json_decode($this->request->getPost('selectedProducts'));
-        $status = $this->request->getPost('status');
-        $kuantitas = $this->request->getPost('kuantitas');
+        $dataOrder = $this->request->getPost();
+        $selectedProducts = json_decode($dataOrder['selectedProducts']);
+        $dataOrder['produk'] = $selectedProducts;
 
-        $orders = new PesananEntity($id, $products, $status, $kuantitas);
-
-
-        echo "<pre>";
-        var_dump($orders);
-        echo "</pre>";
-        // die();
-        // $this->pesananModel->calculateTotal($orders);
+        $orders = new PesananEntity($dataOrder);
         $this->pesananModel->addOrder($orders);
 
         return redirect()->to('/pesanan');
@@ -60,18 +52,11 @@ class Pesanan extends BaseController
 
     public function updateStatus()
     {
-        $id = $this->request->getPost('id');
-        $produk = $this->request->getPost('produk');
-        $status = $this->request->getPost('status');
-        $kuantitas = $this->request->getPost('kuantitas');
+        $dataOrder = $this->request->getPost();
+        // $selectedProducts = json_decode($dataOrder['selectedProducts']);
+        // $dataOrder['produk'] = $selectedProducts;
 
-        $updatedOrder = new PesananEntity($id, $produk, $status, $kuantitas);
-
-        echo "<pre>";
-        var_dump($updatedOrder);
-        echo "</pre>";
-        die();
-
+        $updatedOrder = new PesananEntity($dataOrder);
         $this->pesananModel->updateStatus($updatedOrder);
 
         return redirect()->to('/pesanan');
@@ -86,11 +71,6 @@ class Pesanan extends BaseController
 
     public function delete($id)
     {
-        echo "<pre>";
-        var_dump($id);
-        echo "</pre>";
-        // die();
-
         $this->pesananModel->deleteOrder($id);
 
         return redirect()->to('/pesanan');
