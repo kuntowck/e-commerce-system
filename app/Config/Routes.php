@@ -41,12 +41,14 @@ $routes->get('/user/role/(:alphanum)', [User::class, 'role/$1']);
 
 $routes->group('admin', function ($routes) {
     $routes->get('dashboard', [Admin::class, 'dashboard']);
-    $routes->get('users', [Admin::class, 'users']);
+    $routes->get('users', [Admin::class, 'index']);
 });
 
 $routes->group('api', function ($routes) {
-    $routes->get('users', [Api::class, 'users']);
-    $routes->get('products', [Api::class, 'products']);
+    $routes->get('users', [Api::class, 'listUsers']);
+    $routes->get('users/(:num)', [Api::class, 'detailUser/$1']);
+    $routes->get('products', [Api::class, 'listProducts']);
+    $routes->get('products/(:num)', [Api::class, 'detailProduct/$1']);
 });
 
 $routes->environment('development', static function ($routes) {
