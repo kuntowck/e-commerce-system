@@ -50,13 +50,17 @@ $routes->group('api', function ($routes) {
 });
 
 $routes->environment('development', static function ($routes) {
-    $routes->get('test-environtment', function () {
+    $routes->get('/test-environtment', function () {
         return "Testing environtment: development";
     });
 });
 
 $routes->environment('production', static function ($routes) {
-    $routes->get('test-environtment', function () {
+    $routes->get('/test-environtment', function () {
         return "Testing environtment: production";
     });
+});
+
+$routes->get('/health-check', function () {
+    return 'Server is running...';
 });
