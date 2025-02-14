@@ -15,11 +15,19 @@ class M_User
             new User(1, 'Kunto', 'kunto@a.b', 'admin'),
             new User(2, 'Sultan', 'sultan@a.b', 'admin1')
         ];
+
+        $this->session = session();
     }
 
     private function saveData()
     {
         $this->session->set('users', $this->user);
+    }
+
+    public function setAdminRole()
+    {
+        $this->session->set('role', 'admin');
+        $this->session->set('isLoggedIn', true);
     }
 
     public function getUser()
@@ -36,7 +44,7 @@ class M_User
         }
         return null;
     }
-    
+
     public function addUser(User $user)
     {
         $this->user[] = $user;

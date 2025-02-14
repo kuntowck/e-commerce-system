@@ -2,8 +2,17 @@
 
 namespace App\Controllers;
 
+use App\Models\M_User;
+
 class User extends BaseController
 {
+    private $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new M_User;
+    }
+
     public function index()
     {
         return view('user/dashboard');
@@ -21,6 +30,9 @@ class User extends BaseController
 
     public function role($role)
     {
-        return view('user/role', ['data' => $role]);
+        $this->userModel->setAdminRole();
+
+        return redirect()->to('/user/dashboard')->with('message', 'Role set to admin');
+        // return view('user/role', ['data' => $role]);
     }
 }

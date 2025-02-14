@@ -27,7 +27,7 @@ $routes->get('/about', 'Home::about');
 $routes->resource('produk');
 
 $routes->get('/pesanan', [Pesanan::class, 'index']);
-$routes->get('/pesanan/detail/(:num)', [Pesanan::class, 'detail/$1']);
+$routes->get('/pesanan/detail/(:num)', [Pesanan::class, 'detail/$1'], ['as' => 'pesanan_details']);
 $routes->get('/pesanan/create', [Pesanan::class, 'create']);
 $routes->post('/pesanan/create', [Pesanan::class, 'store']);
 $routes->get('/pesanan/update/(:num)', [Pesanan::class, 'editStatus/$1']);
@@ -39,9 +39,9 @@ $routes->get('/user/profile/(:num)', [User::class, 'profile/$1']);
 $routes->get('/user/settings/(:alpha)', [User::class, 'settings/$1']);
 $routes->get('/user/role/(:alphanum)', [User::class, 'role/$1']);
 
-$routes->group('admin', function ($routes) {
+$routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('dashboard', [Admin::class, 'dashboard']);
-    $routes->get('users', [Admin::class, 'index']);
+    $routes->get('user', [Admin::class, 'index']);
 });
 
 $routes->group('api', function ($routes) {
