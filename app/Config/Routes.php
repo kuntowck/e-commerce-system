@@ -16,15 +16,13 @@ $routes->get('/home', function () {
 });
 $routes->get('/about', 'Home::about');
 
-// $routes->get('/produk', [Produk::class, 'index']);
-// $routes->get('/produk/detail/(:num)', [Produk::class, 'detail/$1'], ['as' => 'product_details']);
-// $routes->get('/produk/create', [Produk::class, 'create']);
-// $routes->post('/produk/create', [Produk::class, 'store']);
-// $routes->get('/produk/edit/(:num)', [Produk::class, 'edit/$1']);
-// $routes->put('/produk/update', [Produk::class, 'update']);
-// $routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1']);
-
-$routes->resource('produk', ['except' => 'create,store']);
+$routes->get('/produk', [Produk::class, 'index']);
+$routes->get('/produk/detail/(:num)', [Produk::class, 'detail/$1'], ['as' => 'product_details']);
+$routes->get('/produk/create', [Produk::class, 'create']);
+$routes->post('/produk/create', [Produk::class, 'store'], ['method' => 'post']);
+$routes->get('/produk/edit/(:num)', [Produk::class, 'edit/$1']);
+$routes->put('/produk/update', [Produk::class, 'update']);
+$routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1'], ['method' => 'delete']);
 
 $routes->get('/pesanan', [Pesanan::class, 'index']);
 $routes->get('/pesanan/detail/(:num)', [Pesanan::class, 'detail/$1']);
