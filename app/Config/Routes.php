@@ -16,20 +16,22 @@ $routes->get('/home', function () {
 });
 $routes->get('/about', 'Home::about');
 
-$routes->get('/produk', [Produk::class, 'index']);
-$routes->get('/produk/detail/(:num)', [Produk::class, 'detail/$1'], ['as' => 'product_details']);
-$routes->get('/produk/create', [Produk::class, 'create']);
-$routes->post('/produk/create', [Produk::class, 'store']);
-$routes->get('/produk/edit/(:num)', [Produk::class, 'edit/$1']);
-$routes->put('/produk/update', [Produk::class, 'update']);
-$routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1']);
+// $routes->get('/produk', [Produk::class, 'index']);
+// $routes->get('/produk/detail/(:num)', [Produk::class, 'detail/$1'], ['as' => 'product_details']);
+// $routes->get('/produk/create', [Produk::class, 'create']);
+// $routes->post('/produk/create', [Produk::class, 'store']);
+// $routes->get('/produk/edit/(:num)', [Produk::class, 'edit/$1']);
+// $routes->put('/produk/update', [Produk::class, 'update']);
+// $routes->delete('/produk/delete/(:num)', [Produk::class, 'delete/$1']);
+
+$routes->resource('produk', ['except' => 'create,store']);
 
 $routes->get('/pesanan', [Pesanan::class, 'index']);
 $routes->get('/pesanan/detail/(:num)', [Pesanan::class, 'detail/$1']);
 $routes->get('/pesanan/create', [Pesanan::class, 'create']);
 $routes->post('/pesanan/create', [Pesanan::class, 'store']);
 $routes->get('/pesanan/update/(:num)', [Pesanan::class, 'editStatus/$1']);
-$routes->post('/pesanan/update/', [Pesanan::class, 'updateStatus']);
+$routes->put('/pesanan/update/(:num)', [Pesanan::class, 'updateStatus/$1']);
 $routes->delete('/pesanan/delete/(:num)', [Pesanan::class, 'delete/$1']);
 
 $routes->get('/user/dashboard', [User::class, 'index'], ['as' => 'user_dashboard']);
@@ -45,4 +47,16 @@ $routes->group('admin', function ($routes) {
 $routes->group('api', function ($routes) {
     $routes->get('users', [Api::class, 'users']);
     $routes->get('products', [Api::class, 'products']);
+});
+
+$routes->environment('development', static function ($routes) {
+    $routes->get('test-environtment', function () {
+        return "Testing environtment: development";
+    });
+});
+
+$routes->environment('production', static function ($routes) {
+    $routes->get('test-environtment', function () {
+        return "Testing environtment: production";
+    });
 });
