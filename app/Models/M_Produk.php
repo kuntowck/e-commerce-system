@@ -14,8 +14,8 @@ class M_Produk
         $this->session = session();
         $this->products = $this->session->get('produk') ?? [];
         // $this->products = [
-        //     new Produk(1, 'Sepatu Bola', 600000, 10, 'Sepatu'),
-        //     new Produk(2, 'Sepatu Running', 800000, 20, 'Sepatu'),
+        //     new Produk(['id' => '1', 'nama' => 'Sepatu Bola', 'harga' => 600000, 'stok' => 10, 'kategori' => 'Sepatu']),
+        //     new Produk(['id' => '2', 'nama' => 'Sepatu Running', 'harga' => 800000, 'stok' => 20, 'kategori' => 'Sepatu']),
         // ];
     }
 

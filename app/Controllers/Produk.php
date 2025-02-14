@@ -4,8 +4,9 @@ namespace App\Controllers;
 
 use App\Models\M_Produk;
 use App\Entities\Produk as ProdukEntity;
+use CodeIgniter\RESTful\ResourceController;
 
-class Produk extends BaseController
+class Produk extends ResourceController
 {
     protected $produkModel;
 
@@ -21,19 +22,24 @@ class Produk extends BaseController
         return view('produk/index', ['products' => $products]);
     }
 
-    public function detail($id)
+    public function show($id = null)
     {
         $product = $this->produkModel->getProductById($id);
+
+        echo "<pre>";
+        var_dump($id);
+        echo "</pre>";
+        // die();
 
         return view('produk/detail', ['product' => $product]);
     }
 
-    public function create()
+    public function new()
     {
         return view('produk/create');
     }
 
-    public function store()
+    public function create()
     {
         $dataProduct = $this->request->getPost();
         $product = new ProdukEntity($dataProduct);
@@ -42,7 +48,7 @@ class Produk extends BaseController
         return redirect()->to('/produk');
     }
 
-    public function update()
+    public function update($id = null)
     {
         $dataProduct = $this->request->getPost();
         $updatedProduct = new ProdukEntity($dataProduct);
@@ -51,14 +57,14 @@ class Produk extends BaseController
         return redirect()->to('/produk');
     }
 
-    public function edit($id)
+    public function edit($id = null)
     {
         $product = $this->produkModel->getProductById($id);
-        
+
         return view('produk/update', ["product" => $product]);
     }
 
-    public function delete($id)
+    public function delete($id = null)
     {
         $this->produkModel->deleteProduct($id);
 
