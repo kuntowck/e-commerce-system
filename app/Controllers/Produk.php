@@ -26,11 +26,6 @@ class Produk extends ResourceController
     {
         $product = $this->produkModel->getProductById($id);
 
-        echo "<pre>";
-        var_dump($id);
-        echo "</pre>";
-        // die();
-
         return view('produk/detail', ['product' => $product]);
     }
 
@@ -42,6 +37,7 @@ class Produk extends ResourceController
     public function create()
     {
         $dataProduct = $this->request->getPost();
+
         $product = new ProdukEntity($dataProduct);
         $this->produkModel->addProduct($product);
 
@@ -51,6 +47,7 @@ class Produk extends ResourceController
     public function update($id = null)
     {
         $dataProduct = $this->request->getPost();
+
         $updatedProduct = new ProdukEntity($dataProduct);
         $this->produkModel->updateProduct($updatedProduct);
 

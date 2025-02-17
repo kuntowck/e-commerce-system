@@ -75,8 +75,9 @@ class M_Pesanan
     {
         $total = 0;
         foreach ($pesanan->getProduk() as $item) {
-            $total += $item['harga'] * $pesanan->getKuantitas();
+            $total += $item->harga * $pesanan->getKuantitas();
         }
+
         $pesanan->setTotal($total);
     }
 }

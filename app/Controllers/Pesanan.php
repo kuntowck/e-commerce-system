@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\M_Pesanan;
 use App\Models\M_Produk;
 use App\Entities\Pesanan as PesananEntity;
+use ReflectionClass;
 
 class Pesanan extends BaseController
 {
@@ -43,18 +44,31 @@ class Pesanan extends BaseController
         $dataOrder = $this->request->getPost();
         $selectedProducts = json_decode($dataOrder['selectedProducts']);
         $dataOrder['produk'] = $selectedProducts;
+        
+        $produk = $this->produkModel->getProductById($dataOrder['produk'][0]->id);
+        $produk->kurangiStok($dataOrder['kuantitas']);
 
         $orders = new PesananEntity($dataOrder);
+        $this->pesananModel->calculateTotal($orders);
         $this->pesananModel->addOrder($orders);
 
         return redirect()->to('/pesanan');
     }
 
-    public function updateStatus()
+    public function updateStatus($id)
     {
-        $dataOrder = $this->request->getPost();
-        // $selectedProducts = json_decode($dataOrder['selectedProducts']);
-        // $dataOrder['produk'] = $selectedProducts;
+        $status = $this->request->getPost('status');
+        $order = $this->pesananModel->getOrderById($id);
+        $order->setStatus($status);
+
+        $reflectionClass = new ReflectionClass($order);
+        $properties = $reflectionClass->getProperties();
+        $dataOrder = [];
+
+        foreach ($properties as $property) {
+            $property->setAccessible(true);
+            $dataOrder[$property->getName()] = $property->getValue($order);
+        }
 
         $updatedOrder = new PesananEntity($dataOrder);
         $this->pesananModel->updateStatus($updatedOrder);

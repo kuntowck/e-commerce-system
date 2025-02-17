@@ -12,7 +12,7 @@
         <input type="text" name="id" required><br>
 
         <label for="produk">Produk:</label>
-        <select name="products[]" id="productSelect">
+        <select name="produk" id="productSelect">
             <?php foreach ($produk as $item): ?>
                 <option value="<?= $item->getId() ?>" data-nama="<?= $item->getNama() ?>" data-harga="<?= $item->getHarga() ?>">
                     <?= $item->getNama(); ?> | Rp<?= $item->getHarga(); ?>

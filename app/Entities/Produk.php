@@ -52,7 +52,7 @@ class Produk
 
     public function kurangiStok($jumlah)
     {
-        if ($this->stok < 0) {
+        if ($this->stok > 0) {
             $this->stok -= $jumlah;
         } else {
             $this->stok = 0;
