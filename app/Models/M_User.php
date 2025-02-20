@@ -6,12 +6,12 @@ use App\Entities\User;
 
 class M_User
 {
-    private $user;
+    private $users;
     private $session;
 
     public function __construct()
     {
-        $this->user = [
+        $this->users = [
             new User(1, 'Kunto', 'kunto@a.b', 'admin'),
             new User(2, 'Sultan', 'sultan@a.b', 'admin1')
         ];
@@ -21,7 +21,7 @@ class M_User
 
     private function saveData()
     {
-        $this->session->set('users', $this->user);
+        $this->session->set('users', $this->users);
     }
 
     public function setAdminRole()
@@ -32,30 +32,47 @@ class M_User
 
     public function getUser()
     {
-        return $this->user;
+        return $this->users;
     }
 
     public function getUserById($id)
     {
-        foreach ($this->user as $value) {
-            if ($value->getId() == $id) {
-                return $value;
+        foreach ($this->users as $user) {
+            if ($user->getId() == $id) {
+                return $user;
             }
         }
         return null;
     }
 
+    public function getUserArrayById($id)
+    {
+        $user = [];
+
+        foreach ($this->users as $value) {
+            if ($value->getId() == $id) {
+                $user[] = [
+                    'id' => $value->getId(),
+                    'name' => $value->getName(),
+                    'email' => $value->getEmail(),
+                    'role' => $value->getRole()
+                ];
+            }
+        }
+        return $user;
+    }
+
     public function addUser(User $user)
     {
-        $this->user[] = $user;
+        $this->users[] = $user;
         $this->saveData();
     }
 
     public function updateUser(User $user)
     {
-        foreach ($this->user as $key => $value) {
+        foreach ($this->users as $key => $value) {
             if ($value->getId() == $user->getId()) {
-                $this->user[$key] = $user;
+                $this->users[$key] = $user;
                 $this->saveData();
             }
         }
@@ -63,7 +80,7 @@ class M_User
 
     public function deleteUser($userId)
     {
-        foreach ($this->user as $key => $value) {
+        foreach ($this->users as $key => $value) {
             if ($value->getId() == $userId) {
                 unset($this->user[$key]);
                 $this->saveData();

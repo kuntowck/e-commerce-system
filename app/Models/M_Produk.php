@@ -13,10 +13,10 @@ class M_Produk
     {
         $this->session = session();
         $this->products = $this->session->get('produk') ?? [];
-        // $this->products = [
-        //     new Produk(['id' => '1', 'nama' => 'Sepatu Bola', 'harga' => 600000, 'stok' => 10, 'kategori' => 'Sepatu']),
-        //     new Produk(['id' => '2', 'nama' => 'Sepatu Running', 'harga' => 800000, 'stok' => 20, 'kategori' => 'Sepatu']),
-        // ];
+        $this->products = [
+            new Produk(['id' => '1', 'nama' => 'Sepatu Bola', 'harga' => 600000, 'stok' => 10, 'kategori' => 'Sepatu']),
+            new Produk(['id' => '2', 'nama' => 'Sepatu Running', 'harga' => 800000, 'stok' => 20, 'kategori' => 'Sepatu']),
+        ];
     }
 
     private function saveData()
@@ -27,6 +27,23 @@ class M_Produk
     public function getAllProducts()
     {
         return $this->products;
+    }
+
+    public function getAllProductsArray()
+    {
+        $products = [];
+
+        foreach ($this->products as $product) {
+            $products[] = [
+                'id' => $product->getId(),
+                'name' => $product->getNama(),
+                'price' => $product->getHarga(),
+                'stock' => $product->getStok(),
+                'category' => $product->getKategori()
+            ];
+        }
+
+        return $products;
     }
 
     public function getProductById($id)
