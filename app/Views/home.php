@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<?= $this->section('title'); ?>
+<?= $title; ?>
+<?= $this->endSection(); ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
+<?= $this->extend('layouts/public_layout'); ?>
 
-<body>
-    <h1>Welcome to User & Product Management System</h1>
-</body>
-
-</html>
+<?= $this->section('content'); ?>
+<h1>Welcome to User & Product Management System</h1>
+<?= $this->endSection(); ?>
