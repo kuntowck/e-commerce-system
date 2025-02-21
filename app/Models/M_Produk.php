@@ -14,8 +14,9 @@ class M_Produk
         $this->session = session();
         $this->products = $this->session->get('produk') ?? [];
         $this->products = [
-            new Produk(['id' => '1', 'nama' => 'Sepatu Bola', 'harga' => 600000, 'stok' => 10, 'kategori' => 'Sepatu']),
-            new Produk(['id' => '2', 'nama' => 'Sepatu Running', 'harga' => 800000, 'stok' => 20, 'kategori' => 'Sepatu']),
+            new Produk(['id' => '1', 'nama' => 'Nasi Goreng', 'harga' => 30000, 'stok' => 15, 'kategori' => 'Makanan', 'status' => 'Active']),
+            new Produk(['id' => '2', 'nama' => 'Sate Ayam', 'harga' => 40000, 'stok' => 25, 'kategori' => 'Makanan', 'status' => 'Active']),
+            new Produk(['id' => '3', 'nama' => 'Takoyaki', 'harga' => 50000, 'stok' => 0, 'kategori' => 'Makanan', 'status' => 'Inactive']),
         ];
     }
 
@@ -39,7 +40,8 @@ class M_Produk
                 'name' => $product->getNama(),
                 'price' => $product->getHarga(),
                 'stock' => $product->getStok(),
-                'category' => $product->getKategori()
+                'category' => $product->getKategori(),
+                'status' => $product->getStatus(),
             ];
         }
 
@@ -90,5 +92,16 @@ class M_Produk
         }
 
         return false;
+    }
+
+    public function getCategoriesByProductId($productId)
+    {
+        $categories = [
+            1 => ['Makanan', 'Rice'],
+            2 => ['Makanan', 'Sate'],
+            3 => ['Makanan', 'Snacks'],
+        ];
+
+        return $categories[$productId];
     }
 }

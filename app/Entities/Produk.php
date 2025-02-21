@@ -4,7 +4,7 @@ namespace App\Entities;
 
 class Produk
 {
-    private $id, $nama, $harga, $stok, $kategori;
+    private $id, $nama, $harga, $stok, $kategori, $status;
 
     public function __construct(array $data)
     {
@@ -13,6 +13,7 @@ class Produk
         $this->harga = $data['harga'] ?? '';
         $this->stok = $data['stok'] ?? '';
         $this->kategori = $data['kategori'] ?? '';
+        $this->status = $data['status'] ?? '';
     }
 
     public function getId()
@@ -72,5 +73,15 @@ class Produk
     public function setKategori($kategori)
     {
         $this->kategori = $kategori;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 }

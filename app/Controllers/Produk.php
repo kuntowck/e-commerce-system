@@ -67,4 +67,30 @@ class Produk extends ResourceController
 
         return redirect()->to('/produk');
     }
+
+    public function productList()
+    {
+        $parser = service('parser');
+
+        $products = $this->produkModel->getAllProductsArray();
+        foreach ($products as $key => &$product) {
+            $product['price'] = number_format($product['price'], 0, ',', '.');
+            $product['stockStatus'] = $product['stock'] > 0 ? 'Available' : 'Out of Stock';
+            $product['categories'] = [$this->produkModel->getCategoriesByProductId($product['id'])];
+
+            if ($key === count($products) - 1) {
+                $product['badgeCell'] = view_cell('ProductBadgeCell', ['text' => 'Sale']);
+            } else {
+                $product['badgeCell'] = view_cell('ProductBadgeCell', ['text' => 'New']);
+            }
+        }
+
+        $data = [
+            'title' => 'Product List',
+            'products' => $products,
+        ];
+        $data['content'] = $parser->setData($data)->render('components/parser_product_list');
+
+        return view('produk/product_list', $data);
+    }
 }

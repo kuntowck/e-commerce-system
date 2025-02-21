@@ -6,7 +6,11 @@ class Home extends BaseController
 {
     public function index()
     {
-        return view('home');
+        $data = [
+            'title' => 'Home Page'
+        ];
+
+        return view('home', $data);
     }
 
     public function about(){
