@@ -12,8 +12,9 @@ class AdminFilter implements FilterInterface
     {
         $session = session();
         $role = $session->get('role');
+        $isLoggedIn = $session->get('isLoggedIn');
 
-        if ($role !== 'admin') {
+        if ($role !== 'admin' && !$isLoggedIn) {
             // Jika tidak, arahkan ke halaman login atau halaman lain yang sesuai
             return redirect()->to('/')->with('error', 'You must be an admin to access this page.');
         }

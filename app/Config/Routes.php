@@ -16,6 +16,8 @@ $routes->get('/home', function () {
 });
 $routes->get('/about', 'Home::about');
 
+$routes->get('/auth/admin/(:alphanum)', [Admin::class, 'role/$1']);
+
 // $routes->get('/produk', [Produk::class, 'index']);
 // $routes->get('/produk/detail/(:num)', [Produk::class, 'show/$1'], ['as' => 'product_details']);
 // $routes->get('/produk/create', [Produk::class, 'create']);
@@ -39,7 +41,6 @@ $routes->group('user', function ($routes) {
     $routes->get('dashboard', [User::class, 'index'], ['as' => 'user_dashboard']);
     $routes->get('profile/(:num)', [User::class, 'profile/$1']);
     $routes->get('settings/(:alpha)', [User::class, 'settings/$1']);
-    $routes->get('role/(:alphanum)', [User::class, 'role/$1']);
 });
 
 $routes->group('admin', ['filter' => 'admin'], function ($routes) {

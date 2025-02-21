@@ -24,6 +24,13 @@ class Admin extends BaseController
         return view('user/index', ['users' => $dataUser]);
     }
 
+    public function role()
+    {
+        $this->userModel->setAdminRole();
+
+        return redirect()->to('/admin/dashboard')->with('message', 'Role set to admin');
+    }
+
     public function dashboard()
     {
         $parser = service('parser');
