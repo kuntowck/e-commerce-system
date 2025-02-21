@@ -87,4 +87,15 @@ class M_User
             }
         }
     }
+
+    public function getActivityHistoryById()
+    {
+        $date = date('d/m/Y | H:i:s');
+
+        return [
+            'login' => $date,
+            'updated' => $date,
+            'ordered' => $date,
+        ];
+    }
 }

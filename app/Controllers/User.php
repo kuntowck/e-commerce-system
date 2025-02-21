@@ -20,7 +20,21 @@ class User extends BaseController
 
     public function profile($id)
     {
-        return view('user/profile', ['data' => $id]);
+        $parser = service('parser');
+
+        $users = $this->userModel->getUserArrayById($id);
+        $activityHistory = $this->userModel->getActivityHistoryById();
+        $accountStatus = 'Active';
+
+        $data = [
+            'title' => 'User Profile',
+            'users' => $users,
+            'activityHistory' => [$activityHistory],
+            'accountStatus' => $accountStatus,
+        ];
+        $data['content'] = $parser->setData($data)->render('components/parser_user_profile');
+
+        return view('user/profile', $data);
     }
 
     public function settings($setting)
@@ -28,11 +42,10 @@ class User extends BaseController
         return view('user/settings', ['data' => $setting]);
     }
 
-    public function role($role)
+    public function role()
     {
         $this->userModel->setAdminRole();
 
-        return redirect()->to('/user/dashboard')->with('message', 'Role set to admin');
-        // return view('user/role', ['data' => $role]);
+        return redirect()->to('/admin/dashboard')->with('message', 'Role set to admin');
     }
 }
