@@ -23,14 +23,19 @@ class User extends BaseController
         $parser = service('parser');
 
         $users = $this->userModel->getUserArrayById($id);
-        $activityHistory = $this->userModel->getActivityHistoryById();
-        $accountStatus = 'Active';
+        $accountStatus = [1 => 'Active', 2 => 'Inactive'];
 
         $data = [
             'title' => 'User Profile',
             'users' => $users,
-            'activityHistory' => [$activityHistory],
-            'accountStatus' => $accountStatus,
+            'userProfileCell' => [
+                [
+                    'login' => view_cell('UserProfileCell', ['text' => 'Logged in']),
+                    'updated' => view_cell('UserProfileCell', ['text' => 'Updated profile']),
+                    'ordered' => view_cell('UserProfileCell', ['text' => 'Place an order'])
+                ]
+            ],
+            'accountStatus' => [$accountStatus],
         ];
         $data['content'] = $parser->setData($data)->render('components/parser_user_profile');
 

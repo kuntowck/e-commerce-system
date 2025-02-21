@@ -10,19 +10,22 @@
         {/users}
         <div class="mb-4">
             <h1 class="text-lg font-bold mb-2">Activity History</h1>
-            {activityHistory}
+            {userProfileCell}
             <div class="overflow-x-auto">
-                <p class="text-lg font-reguler">Logged in: {login}</p>
-                <p class="text-lg font-reguler">Updated profile: {updated}</p>
-                <p class="text-lg font-reguler">Placed an order: {ordered}</p>
+                <div class="mb-2">{!login!}</div>
+                <div class="mb-2">{!updated!}</div>
+                <div class="mb-2">{!ordered!}</div>
             </div>
-            {/activityHistory}
+            {/userProfileCell}
         </div>
         <div class="mb-4">
             <h1 class="text-lg font-bold mb-2">Account Status</h1>
             <div class="overflow-x-auto">
-                <p class="text-lg font-reguler">Account status: {accountStatus}</p>
-
+                {accountStatus}
+                <p class="text-md font-semibold">Account status:
+                    <span class="text-gray-500">{1}</span>
+                </p>
+                {/accountStatus}
             </div>
         </div>
     </div>
