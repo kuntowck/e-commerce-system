@@ -73,6 +73,25 @@ class Produk extends ResourceController
         $parser = service('parser');
 
         $products = $this->produkModel->getAllProductsArray();
+        $inputSearch = $this->request->getGet("search");
+        $categoryFilter = $this->request->getGet("category");
+
+        $cacheKey = 'product_list_search_filter' . md5($inputSearch . '_' . $categoryFilter);
+
+        if ($inputSearch) {
+            $products = array_filter($products, function ($product) use ($inputSearch) {
+                return stripos($product['name'], $inputSearch) !== false;
+            });
+        }
+
+        if ($categoryFilter && $categoryFilter !== 'All') {
+            $products = array_filter($products, function ($product) use ($categoryFilter) {
+                $categories = $this->produkModel->getCategoriesByProductId($product['id']);
+
+                return in_array($categoryFilter, $categories);
+            });
+        }
+
         foreach ($products as $key => &$product) {
             $product['price'] = number_format($product['price'], 0, ',', '.');
             $product['stockStatus'] = $product['stock'] > 0 ? 'Available' : 'Out of Stock';
@@ -86,11 +105,12 @@ class Produk extends ResourceController
         }
 
         $data = [
-            'title' => 'Product List',
+            'title' => 'Product Catalog',
             'products' => $products,
         ];
-        $data['content'] = $parser->setData($data)->render('components/parser_product_list', ['cache' => 86400, 'cache_name' => 'product_list']);
+        $data['content'] = $parser->setData($data)->render('components/parser_product_list');
 
+        cache()->save($cacheKey, $data['content'], 3600);
         return view('produk/product_list', $data);
     }
 }
