@@ -1,58 +1,69 @@
-<!DOCTYPE html>
-<html>
+<?= $this->section('title'); ?>
+<?= $this->endSection(); ?>
 
-<head>
-    <title>Create Order</title>
-</head>
+<?= $this->extend('layouts/public_layout'); ?>
 
-<body>
-    <h1>Create Order</h1>
-    <form action="/pesanan/create" method="post" onsubmit="addProduct()">
-        <label for="id">Id:</label>
-        <input type="text" name="id" required><br>
+<?= $this->section('content'); ?>
+<div class="max-w-screen-xl mx-auto p-4">
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">Create Order</h1>
+        <form action="/pesanan/create" method="post" onsubmit="addProduct()">
+            <div class="mb-4">
+                <label for="id" class="block text-sm font-medium text-gray-700">ID</label>
+                <input type="text" name="id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+            </div>
 
-        <label for="produk">Produk:</label>
-        <select name="produk" id="productSelect">
-            <?php foreach ($produk as $item): ?>
-                <option value="<?= $item->getId() ?>" data-nama="<?= $item->getNama() ?>" data-harga="<?= $item->getHarga() ?>">
-                    <?= $item->getNama(); ?> | Rp<?= $item->getHarga(); ?>
-                </option>
-            <?php endforeach ?>
-        </select><br>
-        <!-- <button type="button" onclick="addProduct()">Tambah Produk</button> -->
+            <div class="mb-4">
+                <label for="produk" class="block text-sm font-medium text-gray-700">Produk</label>
+                <select name="produk" id="productSelect" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <?php foreach ($produk as $item): ?>
+                        <option value="<?= $item->getId() ?>" data-nama="<?= $item->getNama() ?>" data-harga="<?= $item->getHarga() ?>">
+                            <?= $item->getNama(); ?> | Rp<?= $item->getHarga(); ?>
+                        </option>
+                    <?php endforeach ?>
+                </select>
+            </div>
 
-        <label for="status">Status:</label>
-        <input type="text" name="status" required><br>
-        <label for="kuantitas">kuantitas</label>
-        <input type="number" name="kuantitas" id="kuantitas" min="1" requrired><br>
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <input type="text" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+            </div>
 
-        <!-- Hidden input to store selected product -->
-        <input type="hidden" name="selectedProducts" id="selectedProducts">
-        <button type="submit">Create</button>
-    </form>
-    <a href="/pesanan">Back to Order List</a>
+            <div class="mb-4">
+                <label for="kuantitas" class="block text-sm font-medium text-gray-700">Kuantitas</label>
+                <input type="number" name="kuantitas" id="kuantitas" min="1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+            </div>
 
-    <script>
-        function addProduct() {
-            const selectElement = document.getElementById('productSelect')
-            const selectedOptions = Array.from(selectElement.selectedOptions)
+            <!-- Hidden input to store selected product -->
+            <input type="hidden" name="selectedProducts" id="selectedProducts">
 
-            const products = selectedOptions.map(option => ({
-                id: option.value,
-                nama: option.getAttribute('data-nama'),
-                harga: option.getAttribute('data-harga'),
-            }))
+            <div class="flex items-center justify-between">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold text-sm rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Create</button>
+                <a href="/product/list" class="text-sm text-blue-500 hover:underline">Back to Catalog</a>
+            </div>
+        </form>
+    </div>
+</div>
 
-            // const listElement = document.createElement("li")
-            // listElement.textContent = `${products.nama} | Rp${products.harga}`
-            // document.getElementById("produkList").appendChild(listElement)
+<script>
+    function addProduct() {
+        const selectElement = document.getElementById('productSelect')
+        const selectedOptions = Array.from(selectElement.selectedOptions)
 
-            // Set hidden input field with the selected values
-            document.getElementById('selectedProducts').value = JSON.stringify(products);
+        const products = selectedOptions.map(option => ({
+            id: option.value,
+            nama: option.getAttribute('data-nama'),
+            harga: option.getAttribute('data-harga'),
+        }))
 
-            // document.getElementById("selectedProductsId").value = products.map(product => product.id).join(",");
-        }
-    </script>
-</body>
+        // const listElement = document.createElement("li")
+        // listElement.textContent = `${products.nama} | Rp${products.harga}`
+        // document.getElementById("produkList").appendChild(listElement)
 
-</html>
+        // Set hidden input field with the selected values
+        document.getElementById('selectedProducts').value = JSON.stringify(products);
+
+        // document.getElementById("selectedProductsId").value = products.map(product => product.id).join(",");
+    }
+</script>
+<?= $this->endSection(); ?>

@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen bg-gray-50">
     <?= $this->include('components/header'); ?>
 
     <main class="flex flex-grow container mx-auto p-4">

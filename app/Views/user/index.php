@@ -15,6 +15,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -31,6 +32,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?= $user->getRole() ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a href="/user/profile/<?= $user->getId() ?>">Detail</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
