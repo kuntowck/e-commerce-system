@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\M_User;
+use App\Entities\User as UserEntity;
+
 
 class User extends BaseController
 {
@@ -15,19 +17,67 @@ class User extends BaseController
 
     public function index()
     {
-        return view('user/dashboard');
+        $users = $this->userModel->getUser();
+
+        return view('user/index', ['users' => $users]);
+    }
+
+    public function show($id)
+    {
+        $user = $this->userModel->getUserById($id);
+
+        return view('user/detail', ['users' => $user]);
+    }
+
+    public function new()
+    {
+        return view('user/create');
+    }
+
+    public function create()
+    {
+        $dataUser = $this->request->getPost();
+
+        $user = new UserEntity($dataUser);
+        $this->userModel->addUser($user);
+
+        return redirect()->to('user');
+    }
+
+    public function edit($id)
+    {
+        $user = $this->userModel->getUserById($id);
+
+        return view('produk/update', ["data" => $user]);
+    }
+
+    public function update()
+    {
+        $dataUser = $this->request->getPost();
+
+        $updatedUser = new UserEntity($dataUser);
+        $this->userModel->updateUser($updatedUser);
+
+        return redirect()->to('user');
+    }
+
+    public function delete($id)
+    {
+        $this->userModel->deleteUser($id);
+
+        return redirect()->to('user');
     }
 
     public function profile($id)
     {
         $parser = service('parser');
 
-        $users = $this->userModel->getUserArrayById($id);
+        $user = $this->userModel->getUserArrayById($id);
         $accountStatus = [1 => 'Active', 2 => 'Inactive'];
 
         $data = [
-            'title' => 'User Profile',
-            'users' => $users,
+            'title' => 'User Detail',
+            'user' => $user,
             'userProfileCell' => [
                 [
                     'login' => view_cell('UserProfileCell', ['text' => 'Logged in'], 300, 'user_profile_cell'),
@@ -45,12 +95,5 @@ class User extends BaseController
     public function settings($setting)
     {
         return view('user/settings', ['data' => $setting]);
-    }
-
-    public function role()
-    {
-        $this->userModel->setAdminRole();
-
-        return redirect()->to('/admin/dashboard')->with('message', 'Role set to admin');
     }
 }

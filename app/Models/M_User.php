@@ -12,8 +12,8 @@ class M_User
     public function __construct()
     {
         $this->users = [
-            new User(1, 'Kunto', 'kunto@a.b', 'admin'),
-            new User(2, 'Sultan', 'sultan@a.b', 'admin1')
+            new User(['id' => 1, 'name' => 'Kunto', 'email' => 'kunto@a.b', 'role' => 'admin']),
+            new User(['id' => 2, 'name' => 'Sultan', 'email' => 'sultan@a.b', 'role' => 'admin1'])
         ];
 
         $this->session = session();

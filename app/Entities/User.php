@@ -9,27 +9,24 @@ class User
     private $email;
     private $role;
 
-    public function __construct($id, $name, $email, $role)
+    public function __construct(array $data)
     {
-        $this->id = $id;
-        $this->name = $name;
-        $this->email = $email;
-        $this->role = $role;
+        $this->id = $data['id'] ?? '';
+        $this->name = $data['name'] ?? '';
+        $this->email = $data['email'] ?? '';
+        $this->role = $data['role'] ?? '';
     }
 
     public function getId()
     {
         return $this->id;
     }
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
 
     public function getName()
     {
         return $this->name;
     }
+
     public function setName($name)
     {
         $this->name = $name;
@@ -49,6 +46,7 @@ class User
     {
         return $this->role;
     }
+    
     public function setRole($role)
     {
         $this->role = $role;
