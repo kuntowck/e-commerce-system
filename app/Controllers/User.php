@@ -30,7 +30,7 @@ class User extends BaseController
             'users' => $users,
             'userProfileCell' => [
                 [
-                    'login' => view_cell('UserProfileCell', ['text' => 'Logged in']),
+                    'login' => view_cell('UserProfileCell', ['text' => 'Logged in'], 300, 'user_profile_cell'),
                     'updated' => view_cell('UserProfileCell', ['text' => 'Updated profile']),
                     'ordered' => view_cell('UserProfileCell', ['text' => 'Place an order'])
                 ]

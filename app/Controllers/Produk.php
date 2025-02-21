@@ -89,7 +89,7 @@ class Produk extends ResourceController
             'title' => 'Product List',
             'products' => $products,
         ];
-        $data['content'] = $parser->setData($data)->render('components/parser_product_list');
+        $data['content'] = $parser->setData($data)->render('components/parser_product_list', ['cache' => 86400, 'cache_name' => 'product_list']);
 
         return view('produk/product_list', $data);
     }

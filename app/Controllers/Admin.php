@@ -31,12 +31,24 @@ class Admin extends BaseController
         $users = count($this->userModel->getUser());
         $products = count($this->productModel->getAllProducts());
         $orders = count($this->orderModel->getAllOrders());
+        $salesTrends = [
+            'Product A: +20% increase in sales',
+            'Product B: -10% decrease in sales',
+            'Product C: +5% increase in sales',
+        ];
+
+        $inventoryLevels = [
+            'Product A: 50 units in stock',
+            'Product B: 20 units in stock',
+            'Product C: 100 units in stock',
+        ];
 
         $data = [
             'title' => 'Dashboard',
             'users' => $users,
             'products' => $products,
-            'orders' => $orders
+            'orders' => $orders,
+            'productStats' => view_cell('ProductStatisticsCell', ['salesTrends' => $salesTrends, 'inventoryLevels' => $inventoryLevels], 3600, 'product_stats_cell')
         ];
         $data['content'] = $parser->setData($data)->render('components/parser_admin_stats');
 
