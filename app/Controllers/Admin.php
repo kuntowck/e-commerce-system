@@ -21,7 +21,9 @@ class Admin extends BaseController
     {
         $dataUser = $this->userModel->getUser();
 
-        return view('user/index', ['users' => $dataUser]);
+        $output = view('user/index', ['users' => $dataUser]);
+        cache()->save('admin_user_list', $output, 900);
+        return $output;
     }
 
     public function role()
