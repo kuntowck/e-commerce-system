@@ -31,11 +31,7 @@
                     <p class="text-gray-600">Status: {status}</p>
                     <div class="mt-2">
                         <span class="text-md font-semibold text-gray-700">Categories:</span>
-                        {categories}
-                        <span class="list-disc list-inside text-gray-600">
-                            {0} | {1}
-                        </span>
-                        {/categories}
+                        {category}
                     </div>
                 </div>
             </div>

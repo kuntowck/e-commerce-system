@@ -2,7 +2,7 @@
 <?= $title; ?>
 <?= $this->endSection(); ?>
 
-<?= $this->extend('layouts/public_layout'); ?>
+<?= $this->extend('layouts/admin_layout'); ?>
 
 <?= $this->section('content'); ?>
 <?= $content; ?>

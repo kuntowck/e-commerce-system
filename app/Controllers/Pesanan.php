@@ -34,7 +34,7 @@ class Pesanan extends BaseController
 
     public function create()
     {
-        $produk = $this->produkModel->getAllProducts();
+        $produk = $this->produkModel->findAll();
 
         return view('pesanan/create', ['produk' => $produk]);
     }

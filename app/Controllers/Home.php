@@ -13,7 +13,8 @@ class Home extends BaseController
         return view('home', $data);
     }
 
-    public function about(){
+    public function about()
+    {
         return view('about');
     }
 }

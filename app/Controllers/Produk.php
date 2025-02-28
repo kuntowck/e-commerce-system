@@ -4,66 +4,81 @@ namespace App\Controllers;
 
 use App\Models\M_Produk;
 use App\Entities\Produk as ProdukEntity;
+use App\Models\M_Category;
 use CodeIgniter\RESTful\ResourceController;
 
 class Produk extends ResourceController
 {
-    protected $produkModel;
+    protected $produkModel, $produkEntity, $categoryModel;
 
     public function __construct()
     {
         $this->produkModel = new M_Produk();
+        $this->produkEntity = new ProdukEntity();
+        $this->categoryModel = new M_Category();
     }
 
     public function index()
     {
-        $products = $this->produkModel->getAllProducts();
+        $products = $this->produkModel->findAll();
+        $categories = $this->categoryModel->findAll();
 
-        return view('produk/index', ['products' => $products]);
+        return view('produk/index', ['products' => $products, 'categories' => $categories]);
     }
 
     public function show($id = null)
     {
-        $product = $this->produkModel->getProductById($id);
+        $product = $this->produkModel->find($id);
 
         return view('produk/detail', ['product' => $product]);
     }
 
     public function new()
     {
-        return view('produk/create');
+        $categories = $this->categoryModel->findAll();
+
+        return view('produk/create', ['categories' => $categories]);
     }
 
     public function create()
     {
         $dataProduct = $this->request->getPost();
+        $dataProduct['price'] = $this->produkEntity->getPriceToInt($dataProduct['price']);
+        $dataProduct['category_id'] = $this->produkEntity->getPriceToInt($dataProduct['category_id']);
+        // dd($dataProduct);
 
-        $product = new ProdukEntity($dataProduct);
-        $this->produkModel->addProduct($product);
+        if ($this->produkModel->save($dataProduct) === false) {
+            return view('produk/create', ['errors' => $this->produkModel->errors()]);
+        }
 
-        return redirect()->to('/produk');
-    }
-
-    public function update($id = null)
-    {
-        $dataProduct = $this->request->getPost();
-
-        $updatedProduct = new ProdukEntity($dataProduct);
-        $this->produkModel->updateProduct($updatedProduct);
-
+        $this->produkModel->save($dataProduct);
         return redirect()->to('/produk');
     }
 
     public function edit($id = null)
     {
-        $product = $this->produkModel->getProductById($id);
+        $product = $this->produkModel->find($id);
+        $categories = $this->categoryModel->findAll();
 
-        return view('produk/update', ["product" => $product]);
+        return view('produk/update', ["product" => $product, 'categories' => $categories]);
+    }
+
+    public function update($id = null)
+    {
+        $dataProduct = $this->request->getPost();
+        $dataProduct['price'] = $this->produkEntity->getPriceToInt($dataProduct['price']);
+
+        if ($this->produkModel->update($id, $dataProduct) === false) {
+            return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
+        }
+
+        $this->produkModel->update($id, $dataProduct);
+        return redirect()->to('/produk');
     }
 
     public function delete($id = null)
     {
-        $this->produkModel->deleteProduct($id);
+        $this->produkModel->delete($id);
 
         return redirect()->to('/produk');
     }
@@ -72,7 +87,7 @@ class Produk extends ResourceController
     {
         $parser = service('parser');
 
-        $products = $this->produkModel->getAllProductsArray();
+        $products = $this->produkModel->asArray()->findAll();
         $inputSearch = $this->request->getGet("search");
         $categoryFilter = $this->request->getGet("category");
 
@@ -86,7 +101,7 @@ class Produk extends ResourceController
 
         if ($categoryFilter && $categoryFilter !== 'All') {
             $products = array_filter($products, function ($product) use ($categoryFilter) {
-                $categories = $this->produkModel->getCategoriesByProductId($product['id']);
+                $categories = $this->categoryModel->find($product['id']);
 
                 return in_array($categoryFilter, $categories);
             });
@@ -95,7 +110,7 @@ class Produk extends ResourceController
         foreach ($products as $key => &$product) {
             $product['price'] = number_format($product['price'], 0, ',', '.');
             $product['stockStatus'] = $product['stock'] > 0 ? 'Available' : 'Out of Stock';
-            $product['categories'] = [$this->produkModel->getCategoriesByProductId($product['id'])];
+            $product['category'] = [$this->categoryModel->find($product['id'])];
 
             if ($key === count($products) - 1) {
                 $product['badgeCell'] = view_cell('ProductBadgeCell', ['text' => 'Sale']);
@@ -108,6 +123,7 @@ class Produk extends ResourceController
             'title' => 'Product Catalog',
             'products' => $products,
         ];
+        d($data);
         $data['content'] = $parser->setData($data)->render('components/parser_product_list');
 
         cache()->save($cacheKey, $data['content'], 3600);

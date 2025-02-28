@@ -6,22 +6,15 @@ use CodeIgniter\View\Cells\Cell;
 
 class ProductStatisticsCell extends Cell
 {
-    public $salesTrends;
-    public $inventoryLevels;
+    protected $growthPercentage;
 
-    public function mount($salesTrends, $inventoryLevels)
+    public function mount($growthPercentage)
     {
-        $this->salesTrends = $salesTrends;
-        $this->inventoryLevels = $inventoryLevels;
+        $this->growthPercentage = $growthPercentage;
     }
 
-    public function getSalesTrendsProperty()
+    public function getGrowthPercentageProperty()
     {
-        return $this->salesTrends;
-    }
-
-    public function getInventoryLevelsProperty()
-    {
-        return $this->inventoryLevels;
+        return $this->growthPercentage;
     }
 }

@@ -7,7 +7,7 @@
                 <h1 class="text-lg font-bold mb-2">Profile</h1>
                 <p class="text-md font-semibold">
                     Name:
-                    <span class="text-gray-500">{name}</span>
+                    <span class="text-gray-500">{full_name}</span>
                 </p>
                 <p class="text-md font-semibold">
                     Email:
@@ -32,11 +32,9 @@
             <div class="mb-4">
                 <h1 class="text-lg font-bold mb-2">Account Status</h1>
                 <div class="overflow-x-auto">
-                    {accountStatus}
                     <p class="text-md font-semibold">Account status:
-                        <span class="text-gray-500">{1}</span>
+                        <span class="text-gray-500">{accountStatus}</span>
                     </p>
-                    {/accountStatus}
                 </div>
             </div>
         </div>

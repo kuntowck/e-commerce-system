@@ -17,8 +17,8 @@
                 <label for="produk" class="block text-sm font-medium text-gray-700">Produk</label>
                 <select name="produk" id="productSelect" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     <?php foreach ($produk as $item): ?>
-                        <option value="<?= $item->getId() ?>" data-nama="<?= $item->getNama() ?>" data-harga="<?= $item->getHarga() ?>">
-                            <?= $item->getNama(); ?> | Rp<?= $item->getHarga(); ?>
+                        <option value="<?= $item->id ?>" data-nama="<?= $item->name ?>" data-harga="<?= $item->price ?>">
+                            <?= $item->name; ?> | <?= $item->getFormattedPrice(); ?>
                         </option>
                     <?php endforeach ?>
                 </select>
