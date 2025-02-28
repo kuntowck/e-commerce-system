@@ -2,53 +2,54 @@
 
 namespace App\Entities;
 
-class User
+use CodeIgniter\Entity\Entity;
+use CodeIgniter\I18n\Time;
+
+class User extends Entity
 {
-    private $id;
-    private $name;
-    private $email;
-    private $role;
+    protected $datamap = [];
+    protected $dates   = ['created_at', 'updated_at', 'deleted_at'];
+    protected $casts   = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
 
-    public function __construct(array $data)
+    protected $attributes = [
+        'id' => null,
+        'username' => null,
+        'email' => null,
+        'password' => null,
+        'full_name' => null,
+        'role' => null,
+        'status' => null,
+        'last_login' => null,
+    ];
+
+    public function setPassword(string $password)
     {
-        $this->id = $data['id'] ?? '';
-        $this->name = $data['name'] ?? '';
-        $this->email = $data['email'] ?? '';
-        $this->role = $data['role'] ?? '';
+        return $this->attributes['password'] = password_hash($password, PASSWORD_DEFAULT);
     }
 
-    public function getId()
+    public function verifyPassword(string $password)
     {
-        return $this->id;
+        return password_verify($password, $this->attributes['password']);
     }
 
-    public function getName()
+    public function isAdmin()
     {
-        return $this->name;
+        return $this->attributes['role'] === 'admin';
     }
 
-    public function setName($name)
+    public function getFullName()
     {
-        $this->name = $name;
+        return $this->attributes['full_name'];
     }
 
-    public function getEmail()
+    public function getFormattedLastLogin(string $last_login)
     {
-        return $this->email;
-    }
+        $time = Time::parse($last_login);
 
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    public function getRole()
-    {
-        return $this->role;
-    }
-    
-    public function setRole($role)
-    {
-        $this->role = $role;
+        return $time->toLocalizedString('yyyy-MM-dd HH:mm:ss');
     }
 }

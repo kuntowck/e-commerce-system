@@ -2,86 +2,56 @@
 
 namespace App\Entities;
 
-class Produk
+use CodeIgniter\Entity\Entity;
+
+
+class Produk extends Entity
 {
-    private $id, $nama, $harga, $stok, $kategori, $status;
 
-    public function __construct(array $data)
+    protected $datamap = [];
+    protected $dates   = ['created_at', 'updated_at', 'deleted_at'];
+    protected $casts   = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    protected $attributes = [
+        'id' => null,
+        'name' => null,
+        'description' => null,
+        'price' => null,
+        'stock' => null,
+        'category_id' => null,
+        'status' => null,
+        'is_new' => null,
+        'is_sale' => null,
+    ];
+
+    public function getFormattedPrice()
     {
-        $this->id = $data['id'] ?? '';
-        $this->nama = $data['nama'] ?? '';
-        $this->harga = $data['harga'] ?? '';
-        $this->stok = $data['stok'] ?? '';
-        $this->kategori = $data['kategori'] ?? '';
-        $this->status = $data['status'] ?? '';
+        return 'Rp' . number_format($this->attributes['price'], 0, ',', '.');
     }
 
-    public function getId()
+    public function getPriceToInt($price)
     {
-        return $this->id;
+        $priceInt = (int) str_replace(['Rp', '.', ','], '', $price);
+
+        return $priceInt;
     }
 
-    public function getNama()
+    public function isInStock()
     {
-        return $this->nama;
-    }
-
-    public function setNama($nama)
-    {
-        $this->nama = $nama;
-    }
-
-    public function getHarga()
-    {
-        return $this->harga;
-    }
-
-    public function setHarga($harga)
-    {
-        $this->harga = $harga;
-    }
-
-    public function getStok()
-    {
-        return $this->stok;
-    }
-
-    public function setStok($stok)
-    {
-        $this->stok = $stok;
-    }
-
-    public function kurangiStok($jumlah)
-    {
-        if ($this->stok > 0) {
-            $this->stok -= $jumlah;
-        } else {
-            $this->stok = 0;
-        }
-    }
-
-    public function tambahStok($jumlah)
-    {
-        $this->stok += $jumlah;
-    }
-
-    public function getKategori()
-    {
-        return $this->kategori;
-    }
-
-    public function setKategori($kategori)
-    {
-        $this->kategori = $kategori;
+        return $this->stok > 0;
     }
 
     public function getStatus()
     {
-        return $this->status;
+        return $this->attributes['status'] === 'available' ? 'Available' : 'Unavailable';
     }
 
-    public function setStatus($status)
+    public function isSale()
     {
-        $this->status = $status;
+        return $this->attributes['is_sale'] === true;
     }
 }
