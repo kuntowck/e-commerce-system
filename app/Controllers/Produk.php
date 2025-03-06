@@ -56,7 +56,8 @@ class Produk extends ResourceController
     public function edit($id = null)
     {
         $product = $this->produkModel->find($id);
-        $categories = $this->categoryModel->findAll();
+        $categories = $this->categoryModel->select('id, name')->findAll();
+        d($product);
 
         return view('produk/update', ["product" => $product, 'categories' => $categories]);
     }
