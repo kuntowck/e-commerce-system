@@ -4,15 +4,15 @@ namespace App\Cells;
 
 use CodeIgniter\View\Cells\Cell;
 
-class ProductBadgeCell extends Cell
+class BadgeCell extends Cell
 {
     protected $text, $theme;
 
     public function mount()
     {
-        if ($this->text === 'new' || $this->text === 'New') {
+        if ($this->text === 'new' || $this->text === 'New' || $this->text === 'active') {
             $this->theme = 'green';
-        } else if ($this->text === 'sale' || $this->text === 'Sale') {
+        } else if ($this->text === 'sale' || $this->text === 'Sale' || $this->text === 'inactive') {
             $this->theme = 'red';
         }
     }

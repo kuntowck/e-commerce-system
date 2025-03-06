@@ -4,6 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 use App\Entities\User;
+use App\Libraries\DataParams;
+use CodeIgniter\I18n\Time;
+use DateTime;
 
 class M_User extends Model
 {
@@ -80,9 +83,10 @@ class M_User extends Model
     {
         $currentMonth = date('Y-m');
 
-        return $this->where('created_at >=', "$currentMonth-01 00:00:00")
-            ->where('created_at <=', "$currentMonth-31 23:59:59")
-            ->countAllResults();
+        return Time();
+        // return $this->where('created_at >=', "$currentMonth-01 00:00:00")
+        //     ->where('created_at <=', "$currentMonth-31 23:59:59")
+        //     ->countAllResults();
     }
 
     public function getUserStatistics()
@@ -92,18 +96,21 @@ class M_User extends Model
         $stats['new_users_this_month'] = $this->getNewUsersThisMonth();
 
         $previousMonth = date('Y-m', strtotime('-1 month'));
-        $newUsersLastMonth = $this->where('created_at >=', "$previousMonth-01 00:00:00")
-            ->where('created_at <=', "$previousMonth-31 23:59:59")
-            ->countAllResults();
+        $newUsersLastMonth = Time();
+        // $this->where('created_at >=', "$previousMonth-01 00:00:00")
+        //     ->where('created_at <=', "$previousMonth-31 23:59:59")
+        //     ->countAllResults();
         $growthPercentage = $newUsersLastMonth > 0 ? (($stats['new_user_this_month'] - $newUsersLastMonth) / $newUsersLastMonth) * 100 : 0;
         $stats['growth_percentage'] = $growthPercentage;
 
         return $stats;
     }
 
-    public function updateLastLogin($userId, $lastLoginTime)
+    public function updateLastLogin($userId)
     {
-        return $this->update($userId, ['last_login' => $lastLoginTime]);
+        return $this->where('id', $userId)
+            ->set('last_login', date('Y-m-d H:i:s'))
+            ->update();
     }
 
     public function setAdminRole()
@@ -112,5 +119,61 @@ class M_User extends Model
 
         $this->session->set('role', 'admin');
         $this->session->set('isLoggedIn', true);
+    }
+
+    public function getFilteredUsers(DataParams $params)
+    {
+        // Apply search
+        if (!empty($params->search)) {
+            $this->groupStart()
+                ->like('full_name', $params->search, 'both', null, true)
+                ->orLike('username', $params->search, 'both', null, true)
+                ->orLike('email', $params->search, 'both', null, true)
+                ->orLike('role', $params->search, 'both', null, true)
+                ->orLike('status', $params->search, 'both', null, true);
+
+            if (is_numeric($params->search)) {
+                $this->orWhere('CAST (id as TEXT) LIKE', "%$params->search%");
+            }
+            $this->groupEnd();
+        }
+
+        // Apply role filter
+        if (!empty($params->role)) {
+            $this->where('role', $params->role);
+        }
+
+        // Apply status filter
+        if (!empty($params->status)) {
+            $this->where('status', $params->status);
+        }
+
+        // Apply sort
+        $allowedSortColumns = ['id', 'full_name', 'email', 'role', 'status', 'last_login'];
+        $sort = in_array($params->sort, $allowedSortColumns) ? $params->sort : 'id';
+        $order = ($params->order === 'desc') ? 'desc' : 'asc';
+
+        $this->orderBy($sort, $order);
+
+        $result = [
+            'users' => $this->paginate($params->perPage, 'users', $params->page),
+            'pager' => $this->pager,
+            'total' => $this->countAllResults(false)
+        ];
+        return $result;
+    }
+
+    public function getAllRoles()
+    {
+        $roles = $this->select('role')->distinct()->findAll();
+
+        return array_column($roles, 'role');
+    }
+
+    public function getAllStatus()
+    {
+        $statuses = $this->select('status')->distinct()->findAll();
+
+        return array_column($statuses, 'status');
     }
 }

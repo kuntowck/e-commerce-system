@@ -113,9 +113,9 @@ class Produk extends ResourceController
             $product['category'] = [$this->categoryModel->find($product['id'])];
 
             if ($key === count($products) - 1) {
-                $product['badgeCell'] = view_cell('ProductBadgeCell', ['text' => 'Sale']);
+                $product['badgeCell'] = view_cell('BadgeCell', ['text' => 'Sale']);
             } else {
-                $product['badgeCell'] = view_cell('ProductBadgeCell', ['text' => 'New']);
+                $product['badgeCell'] = view_cell('BadgeCell', ['text' => 'New']);
             }
         }
 
@@ -123,7 +123,6 @@ class Produk extends ResourceController
             'title' => 'Product Catalog',
             'products' => $products,
         ];
-        d($data);
         $data['content'] = $parser->setData($data)->render('components/parser_product_list');
 
         cache()->save($cacheKey, $data['content'], 3600);

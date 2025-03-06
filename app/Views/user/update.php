@@ -61,7 +61,7 @@
                     <option value="active" <?= $user->status == 'active' ? 'selected' : '' ?>>
                         Active
                     </option>
-                    <option value="inacitve" <?= $user->status == 'inacitve' ? 'selected' : '' ?>>
+                    <option value="inactive" <?= $user->status == 'inacitve' ? 'selected' : '' ?>>
                         Inactive
                     </option>
                 </select>

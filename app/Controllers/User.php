@@ -4,8 +4,7 @@ namespace App\Controllers;
 
 use App\Models\M_User;
 use App\Entities\User as UserEntity;
-
-
+use App\Libraries\DataParams;
 
 class User extends BaseController
 {
@@ -19,9 +18,35 @@ class User extends BaseController
 
     public function index()
     {
-        $dataUser = $this->userModel->findAll();
+        $data['user'] = $this->userModel->findAll();
 
-        $output = view('user/index', ['users' => $dataUser]);
+        $params = new DataParams([
+            'search' => $this->request->getGet('search'),
+            'role' => $this->request->getGet('role'),
+            'status' => $this->request->getGet('status'),
+            'sort' => $this->request->getGet('sort'),
+            'order' => $this->request->getGet('order'),
+            'page' => $this->request->getGet('page_users'),
+            'perPage' => $this->request->getGet('perPage')
+        ]);
+
+        $results = $this->userModel->getFilteredUsers($params);
+
+        foreach ($results['users'] as &$user) {
+            $user->status_cell = view_cell('BadgeCell', ['text' => $user->status]);
+        }
+
+        $data = [
+            'users' => $results['users'],
+            'pager' => $results['pager'],
+            'total' => $results['total'],
+            'params' => $params,
+            'roles' => $this->userModel->getAllRoles(),
+            'statuses' => $this->userModel->getAllStatus(),
+            'baseURL' => base_url('admin/user')
+        ];
+
+        $output = view('user/index', $data);
         cache()->save('admin_user_list', $output, 900);
         return $output;
     }
@@ -38,6 +63,7 @@ class User extends BaseController
         $parser = service('parser');
 
         $user = $this->userModel->asArray()->find($id);
+        $this->userModel->updateLastLogin($id);
 
         $data = [
             'title' => 'User Detail',
@@ -67,7 +93,6 @@ class User extends BaseController
         $dataUser['password'] = $this->userEntity->setPassword($dataUser['password']);
 
         if ($this->userModel->save($dataUser) === false) {
-            d($this->userModel->errors());
             return view('user/create', ['errors' => $this->userModel->errors()]);
         }
 
