@@ -3,19 +3,16 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use App\Entities\Produk;
 
 class M_Produk extends Model
 {
-    private $products = [];
-
     protected $table            = 'products';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = \App\Entities\Produk::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'name', 'description', 'price', 'stock', 'status', 'is_new', 'is_sale'];
+    protected $allowedFields    = ['id', 'name', 'description', 'price', 'stock', 'category_id', 'status', 'is_new', 'is_sale'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -74,6 +71,19 @@ class M_Produk extends Model
     public function getLowStockProducts($threshold = 5)
     {
         return $this->where('stock <', $threshold)->countAllResults();
+    }
+
+    public function getProductJoinCategoriesImages()
+    {
+        return $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->join('product_images', "product_images.product_id = products.id AND product_images.is_primary = 'true'", 'left');
+    }
+
+    public function getProductJoinCategories()
+    {
+        return $this->select('products.*, categories.name as category_name')
+            ->join('categories', 'categories.id = products.category_id',);
     }
 
     public function getProductsByCategory($category)

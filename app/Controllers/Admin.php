@@ -37,17 +37,17 @@ class Admin extends BaseController
     {
         $parser = service('parser');
 
-        // $users = $this->userModel->getUserStatistics();
-        // d($users);
+        $users = $this->userModel->getUserStatistics();
         $orders = count($this->orderModel->getAllOrders());
         $products = $this->productModel->getProductStatistics();
 
         $data = [
             'title' => 'Dashboard',
-            // 'users' => [$users],
+            'users' => [$users],
             'products' => [$products],
             'orders' => $orders,
-            // 'productStats' => view_cell('ProductStatisticsCell', ['growthPercentage'=> $users['growth_percentage']], 3600, 'product_stats_cell')
+            'productStats' => view_cell('ProductStatisticsCell', ['growthPercentage' => $users['growth_percentage']], 3600, 'product_stats_cell')
+
         ];
         $data['content'] = $parser->setData($data)->render('components/parser_admin_stats');
 

@@ -35,23 +35,21 @@ class Produk extends ResourceController
 
     public function new()
     {
-        $categories = $this->categoryModel->findAll();
+        $data['categories'] = $this->categoryModel->select('id, name')->findAll();
 
-        return view('produk/create', ['categories' => $categories]);
+        return view('produk/create', $data);
     }
 
     public function create()
     {
         $dataProduct = $this->request->getPost();
         $dataProduct['price'] = $this->produkEntity->getPriceToInt($dataProduct['price']);
-        $dataProduct['category_id'] = $this->produkEntity->getPriceToInt($dataProduct['category_id']);
         // dd($dataProduct);
 
-        if ($this->produkModel->save($dataProduct) === false) {
-            return view('produk/create', ['errors' => $this->produkModel->errors()]);
+        if (!$this->produkModel->save($dataProduct)) {
+            return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
         }
 
-        $this->produkModel->save($dataProduct);
         return redirect()->to('/produk');
     }
 

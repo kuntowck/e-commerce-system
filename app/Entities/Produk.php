@@ -35,7 +35,7 @@ class Produk extends Entity
 
     public function getPriceToInt($price)
     {
-        $priceInt = (int) str_replace(['Rp', '.', ','], '', $price);
+        $priceInt = str_replace(['Rp', '.', ','], '', $price);
 
         return $priceInt;
     }
