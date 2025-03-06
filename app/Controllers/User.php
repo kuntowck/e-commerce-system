@@ -92,11 +92,10 @@ class User extends BaseController
         $dataUser = $this->request->getPost();
         $dataUser['password'] = $this->userEntity->setPassword($dataUser['password']);
 
-        if ($this->userModel->save($dataUser) === false) {
-            return view('user/create', ['errors' => $this->userModel->errors()]);
+        if (!$this->userModel->save($dataUser)) {
+            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
         }
 
-        $this->userModel->save($dataUser);
         return redirect()->to('admin/user');
     }
 
@@ -114,8 +113,7 @@ class User extends BaseController
         $this->userModel->setValidationRule("username", "required|is_unique[users.username,id,{$id}]|min_length[3]|max_length[255]");
         $this->userModel->setValidationRule("email", "required|is_unique[users.email,id,{$id}]|valid_email|max_length[255]");
 
-        if ($this->userModel->update($id, $dataUser) === false) {
-            d($this->userModel->errors());
+        if (!$this->userModel->update($id, $dataUser)) {
             return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
         }
 

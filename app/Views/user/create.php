@@ -1,7 +1,7 @@
 <?= $this->section('title'); ?>
 <?= $this->endSection(); ?>
 
-<?= $this->extend('layouts/public_layout'); ?>
+<?= $this->extend('layouts/admin_layout'); ?>
 
 <?= $this->section('content'); ?>
 <div class="max-w-screen-xl mx-auto p-4">
@@ -12,42 +12,70 @@
 
             <div class="mb-4">
                 <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                <input id="full_name" type="text" name="full_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input
+                    id="full_name"
+                    type="text"
+                    name="full_name"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    data-pristine-required
+                    data-pristine-required-message="Name is required."
+                    data-pristine-minlength="3"
+                    data-pristine-minlength-message="Name must be at least 3 characters long."
+                    value="<?= old('full_name') ?>">
             </div>
 
             <div class="mb-4">
                 <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                <input id="username" type="text" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     data-pristine-required
-                    data-pristine-required-message="Username harus diisi"
+                    data-pristine-required-message="Username is required."
                     data-pristine-minlength="3"
-                    data-pristine-minlength-message="Username minimal 3 karakter"
+                    data-pristine-minlength-message="Username must be at least 3 characters long."
                     value="<?= old('username') ?>">
-                <?php if (! empty($errors['username'])): ?>
-                    <div class="text-red-800 text-xs font-medium mt-2">
-                        <p><?= esc($errors['username']) ?></p>
-                    </div>
-                <?php endif ?>
+
+                <div class="text-red-800 text-xs font-medium mt-2">
+                    <?= session('errors.username') ?? ''; ?>
+                </div>
             </div>
 
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input id="email" type="email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <?php if (! empty($errors['email'])): ?>
-                    <div class="text-red-800 text-xs font-medium mt-2">
-                        <p><?= esc($errors['email']) ?></p>
-                    </div>
-                <?php endif ?>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    data-pristine-required
+                    data-pristine-required-message="Email is required"
+                    data-pristine-type="email"
+                    data-pristine-type-message="Please provide a valid email address."
+                    value="<?= old('email') ?>">
+
+                <div class="text-red-800 text-xs font-medium mt-2">
+                    <?= session('errors.email') ?? ''; ?>
+                </div>
             </div>
 
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input id="password" type="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <?php if (! empty($errors['password'])): ?>
-                    <div class="text-red-800 text-xs font-medium mt-2">
-                        <p><?= esc($errors['password']) ?></p>
-                    </div>
-                <?php endif ?>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    data-pristine-required
+                    data-pristine-required-message="Password is required."
+                    data-pristine-minlength="8"
+                    data-pristine-minlength-message="Password must be at least 8 characters long."
+                    value="<?= old('password') ?>">
+
+                <div class="text-red-800 text-xs font-medium mt-2">
+                    <?= session('errors.password'); ?>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -81,7 +109,9 @@
         </form>
     </div>
 </div>
+<?= $this->endSection(); ?>
 
+<?= $this->section('scripts'); ?>
 <script>
     let pristine;
     window.onload = function() {
