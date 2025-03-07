@@ -5,34 +5,32 @@
 
 <?= $this->section('content'); ?>
 <div class="max-w-screen-xl mx-auto p-4 mb-10">
-    <div class="bg-white shadow-sm rounded-md p-6">
-        <h1 class="text-2xl font-bold mb-4">Product Detail</h1>
-        <div class="mb-4">
-            <h1 class="text-lg font-bold mb-2">Profile</h1>
-            <p class="text-md font-semibold">
-                ID:
-                <span class="text-gray-500"><?= $product->id ?></span>
-            </p>
-            <p class="text-md font-semibold">
-                Name:
-                <span class="text-gray-500"><?= $product->name ?></span>
-            </p>
-            <p class="text-md font-semibold">
-                Price:
-                <span class="text-gray-500"><?= $product->getFormattedPrice() ?></span>
-            </p>
-            <p class="text-md font-semibold">
-                Stock:
-                <span class="text-gray-500"><?= $product->stock ?></span>
-            </p>
-            <p class="text-md font-semibold">
-                Status:
-                <span class="text-gray-500"><?= $product->status ?></span>
-            </p>
+    <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div>
+            <img class="rounded-t-lg" src="<?= base_url('assets/img/' . $product->image_path); ?>" alt="<?= $product->image_path; ?>" />
         </div>
-        <div class="flex items-center justify-between">
-            <a href="/produk" class="text-sm text-blue-500 hover:underline">Back to Product List</a>
+
+        <div class="px-4 mt-4 flex gap-0">
+            <?= $product->is_new ? view_cell('BadgeCell', ['text' => 'New']) : ''; ?>
+            <?= $product->is_sale ? view_cell('BadgeCell', ['text' => 'Sale']) : ''; ?>
+        </div>
+
+        <div class="px-4 py-2 mb-4">
+            <h3 class="text-2xl font-bold tracking-tight text-gray-900 "><?= $product->getFormattedPrice(); ?></h3>
+            <h5 class="text-lg font-semibold tracking-tight text-gray-900 "><?= $product->name; ?></h5>
+            <p class="font-regular text-gray-500"><?= $product->category_name; ?></p>
+            <p class="font-medium text-gray-700"><?= $product->description; ?></p>
+            <p class="font-medium text-gray-700"><?= $product->stock; ?> Stocks (<?= $product->status; ?>)</p>
+        </div>
+        <div class="px-4 mb-4">
+            <a href="/produk" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                Back to Product List
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="4" stroke="currentColor" class="w-3.5 h-3.5 ms-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+            </a>
         </div>
     </div>
+</div>
 </div>
 <?= $this->endSection(); ?>

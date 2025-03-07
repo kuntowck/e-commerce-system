@@ -49,9 +49,7 @@
                     data-pristine-required
                     data-pristine-required-message="Price is required."
                     data-pristine-type="numeric"
-                    data-pristine-type-message="Price must be a numeric value."
-                    data-pristine-min="1"
-                    data-pristine-min-message="price must be greater than 0.">
+                    data-pristine-type-message="Price must be a numeric value.">
 
                 <div class="text-red-800 text-xs font-medium mt-2">
                     <?= session('errors.price') ?? ''; ?>

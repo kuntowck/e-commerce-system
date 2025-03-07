@@ -22,15 +22,15 @@ class Produk extends ResourceController
     {
         $products = $this->produkModel->findAll();
         $categories = $this->categoryModel->findAll();
-
+        
         return view('produk/index', ['products' => $products, 'categories' => $categories]);
     }
-
+    
     public function show($id = null)
     {
-        $product = $this->produkModel->find($id);
+        $data['product'] = $this->produkModel->getProductJoinCategoriesImages()->find($id);
 
-        return view('produk/detail', ['product' => $product]);
+        return view('produk/detail', $data);
     }
 
     public function new()
@@ -44,7 +44,6 @@ class Produk extends ResourceController
     {
         $dataProduct = $this->request->getPost();
         $dataProduct['price'] = $this->produkEntity->getPriceToInt($dataProduct['price']);
-        // dd($dataProduct);
 
         if (!$this->produkModel->save($dataProduct)) {
             return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
