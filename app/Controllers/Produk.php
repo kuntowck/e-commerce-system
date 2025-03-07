@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\M_Produk;
 use App\Entities\Produk as ProdukEntity;
+use App\Libraries\DataParams;
 use App\Models\M_Category;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -20,12 +21,31 @@ class Produk extends ResourceController
 
     public function index()
     {
-        $products = $this->produkModel->findAll();
-        $categories = $this->categoryModel->findAll();
-        
-        return view('produk/index', ['products' => $products, 'categories' => $categories]);
+        $params = new DataParams([
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "order" => $this->request->getGet("order"),
+            "perPage" => $this->request->getGet("perPage"),
+            "page" => $this->request->getGet("page_products"),
+            "category_id" => $this->request->getGet("category_id"),
+            "price_range" => $this->request->getGet("price_range"),
+        ]);
+
+        $result = $this->produkModel->getFilteredProducts($params);
+
+        $data = [
+            'products' => $result['products'],
+            'pager' => $result['pager'],
+            'total' => $result['total'],
+            'params' => $params,
+            'categories' => $this->categoryModel->findAll(),
+            'statuses' => $this->produkModel->getAllStatus(),
+            'baseURL' => base_url('produk'),
+        ];
+
+        return view('produk/index', $data);
     }
-    
+
     public function show($id = null)
     {
         $data['product'] = $this->produkModel->getProductJoinCategoriesImages()->find($id);

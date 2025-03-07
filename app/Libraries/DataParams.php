@@ -7,34 +7,46 @@ use CodeIgniter\HTTP\IncomingRequest;
 class DataParams
 {
     public $search = '';
-    public $role = '';
-    public $status = '';
     public $sort = 'id';
     public $order = 'asc';
     public $page = 1;
     public $perPage = 2;
 
+    // user filter
+    public $role = '';
+    public $status = '';
+
+    // product filter
+    public $price_range = '';
+    public $category_id = '';
+
     public function __construct(array $params = [])
     {
         $this->search = $params['search'] ?? '';
-        $this->role = $params['role'] ?? '';
-        $this->status = $params['status'] ?? '';
         $this->sort = $params['sort'] ?? 'id';
         $this->order = $params['order'] ?? 'asc';
         $this->page = (int)($params['page'] ?? 1);
         $this->perPage = (int)($params['perPage'] ?? 2);
+
+        $this->role = $params['role'] ?? '';
+        $this->status = $params['status'] ?? '';
+
+        $this->category_id = $params['category_id'] ?? '';
+        $this->price_range = $params['price_range'] ?? '';
     }
 
     public function getParams()
     {
         return [
             'search' => $this->search,
-            'role' => $this->role,
-            'status' => $this->status,
             'sort' => $this->sort,
             'order' => $this->order,
             'page' => $this->page,
-            'perPage' => $this->perPage
+            'perPage' => $this->perPage,
+            'role' => $this->role,
+            'status' => $this->status,
+            'category_id' => $this->category_id,
+            'price_range' => $this->price_range
         ];
     }
 

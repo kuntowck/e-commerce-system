@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Libraries\DataParams;
 use CodeIgniter\Model;
 
 class M_Produk extends Model
@@ -12,7 +13,7 @@ class M_Produk extends Model
     protected $returnType       = \App\Entities\Produk::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'name', 'description', 'price', 'stock', 'category_id', 'status', 'is_new', 'is_sale'];
+    protected $allowedFields    = ['id', 'name', 'description', 'price', 'stock', 'category_id', 'status', 'is_new', 'is_sale', 'created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -81,12 +82,6 @@ class M_Produk extends Model
             ->where('product_images.is_primary', 1);
     }
 
-    public function getProductJoinCategories()
-    {
-        return $this->select('products.*, categories.name as category_name')
-            ->join('categories', 'categories.id = products.category_id',);
-    }
-
     public function getProductsByCategory($category)
     {
         return $this->where('category', $category)->findAll();
@@ -115,5 +110,79 @@ class M_Produk extends Model
         ];
 
         return $categories[$productId];
+    }
+
+    public function getFilteredProducts(DataParams $params, $catalogue = null)
+    {
+        if (isset($catalogue)) {
+            $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
+                ->join('categories', 'categories.id = products.category_id', 'left')
+                ->join('product_images', "product_images.product_id = products.id AND product_images.is_primary = 'true'", 'left')
+                ->where('products.status', "Active");
+        } else {
+            $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
+                ->join('categories', 'categories.id = products.category_id', 'left')
+                ->join('product_images', "product_images.product_id = products.id AND product_images.is_primary = 'true'", 'left');
+        }
+
+        // Apply search
+        if (!empty($params->search)) {
+            $this->groupStart()
+                ->like('products.name', $params->search, 'both', null, true)
+                ->orLike('products.description', $params->search, 'both', null, true)
+                ->orLike('products.status', $params->search, 'both', null, true);
+
+            if (is_numeric($params->search)) {
+                $this->orWhere('CAST (products.id AS TEXT) LIKE', "%$params->search%")
+                    ->orWhere('CAST (products.price AS TEXT) LIKE', "%$params->search%")
+                    ->orWhere('CAST (products.stock AS TEXT) LIKE', "%$params->search%");
+            }
+            $this->groupEnd();
+        }
+
+        // Apply category filter
+        if (!empty($params->category_id)) {
+            $this->where('products.category_id', $params->category_id);
+        }
+
+        // Apply price range filter
+        if (!empty($params->price_range)) {
+            $priceRange = $params->price_range;
+
+            if ($params->price_range == '1000000') {
+                $this->where('products.price >=', $params->price_range);
+            } else {
+                $params->price_range = explode('-', $params->price_range);
+                $this->where('products.price >=', $params->price_range[0]);
+                $this->where('products.price <=', $params->price_range[1]);
+            }
+
+            $params->price_range = $priceRange;
+        }
+
+        $allowedSortColumns = ['id', 'name', 'description', 'price', 'stock', 'status', 'category_id', 'category_name', 'image_path', 'created_at'];
+        $sort = in_array($params->sort, $allowedSortColumns) ? $params->sort : 'id';
+        $order = ($params->order === 'desc') ? 'desc' : 'asc';
+
+        $this->orderBy($sort, $order);
+        $result = [
+            'products' => $this->paginate($params->perPage, 'products', $params->page),
+            'pager' => $this->pager,
+            'total' => $this->countAllResults(false),
+        ];
+
+        return $result;
+    }
+
+    public function getAllStatus()
+    {
+        $statuses = $this->select('status')->distinct()->findAll();
+        return array_column($statuses, 'status');
+    }
+
+    public function getAllCategories()
+    {
+        return $this->select('products.*, categories.name as category_name')
+            ->join('categories', 'categories.id = products.category_id',);
     }
 }
