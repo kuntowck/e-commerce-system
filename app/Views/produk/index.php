@@ -36,18 +36,11 @@
                 <div>
                     <select name="price_range" class="form-select mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="this.form.submit()">
                         <option value="">All Price</option>
-                        <option value="0-25000" <?= ($params->price_range == "0-50000") ? 'selected' : '' ?>>
-                            Rp0 - Rp25.000
-                        </option>
-                        <option value="25000-50000" <?= ($params->price_range == "50000-100000") ? 'selected' : '' ?>>
-                            Rp25.000 - Rp50.000
-                        </option>
-                        <option value="50000-100000" <?= ($params->price_range == "100000-500000") ? 'selected' : '' ?>>
-                            Rp50.000 - Rp100.000
-                        </option>
-                        <option value="100000-200000" <?= ($params->price_range == "500000-1000000") ? 'selected' : '' ?>>
-                            Rp100.000 - Rp200.000
-                        </option>
+                        <?php foreach ($priceRange as $price): ?>
+                            <option value="<?= $price['value']; ?>" <?= ($params->price_range == $price['value']) ? 'selected' : '' ?>>
+                                <?= $price['label']; ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 

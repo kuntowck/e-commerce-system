@@ -152,7 +152,12 @@ class M_Produk extends Model
 
     public function getAllPriceRange()
     {
-        return ['0-25000', '25000-50000', '50000-100000', '100000-200000'];
+        return [
+            ['value' => '0-25000', 'label' => '0 - Rp25.000'],
+            ['value' => '25000-50000', 'label' => 'Rp25.000 - Rp50.000'],
+            ['value' => '50000-100000', 'label' => 'Rp50.000 - Rp100.000'],
+            ['value' => '100000-200000', 'label' => 'Rp100.000 - Rp200.000']
+        ];
     }
 
     public function getProductJoinCategories()

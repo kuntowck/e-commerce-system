@@ -39,6 +39,7 @@ class Produk extends ResourceController
             'total' => $result['total'],
             'params' => $params,
             'categories' => $this->categoryModel->findAll(),
+            'priceRange' => $this->produkModel->getAllPriceRange(),
             'baseURL' => base_url('produk'),
         ];
 
