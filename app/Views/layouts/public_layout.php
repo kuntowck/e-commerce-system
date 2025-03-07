@@ -10,7 +10,9 @@
 </head>
 
 <body class="flex flex-col min-h-screen bg-gray-50">
-    <?= $this->include('components/header'); ?>
+    <header>
+        <?= $this->include('components/header'); ?>
+    </header>
 
     <main class="">
         <section class="">
@@ -18,7 +20,7 @@
         </section>
     </main>
 
-    <footer>
+    <footer class="bg-white rounded-lg shadow-sm m-4">
         <?= $this->include('components/footer'); ?>
     </footer>
 

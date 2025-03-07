@@ -38,7 +38,7 @@
             <input type="hidden" name="selectedProducts" id="selectedProducts">
 
             <div class="flex items-center justify-between">
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold text-sm rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Create</button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer">Create</button>
                 <a href="/product/list" class="text-sm text-blue-500 hover:underline">Back to Catalog</a>
             </div>
         </form>

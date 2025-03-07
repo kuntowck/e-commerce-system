@@ -1,5 +1,5 @@
-<div class="container mx-auto p-4">
-    <div class="bg-white shadow-sm rounded-lg p-6">
+<div class="w-full max-w-screen-xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg p-8">
         <h1 class="text-2xl font-bold mb-4">{title}</h1>
         <div class="flex gap-16">
             <div>

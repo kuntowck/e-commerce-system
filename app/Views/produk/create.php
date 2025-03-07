@@ -4,7 +4,7 @@
 <?= $this->extend('layouts/admin_layout'); ?>
 
 <?= $this->section('content'); ?>
-<div class="max-w-screen-xl mx-auto p-4">
+<div class="max-w-screen-xl mx-auto">
     <div class="bg-white shadow-sm rounded-lg p-6">
         <h1 class="text-2xl font-bold mb-6">Add Product</h1>
         <form id="formData" action="/produk" method="post" novalidate>
@@ -135,7 +135,7 @@
             </div>
 
             <div class="flex items-center justify-between">
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold text-sm rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer">Create</button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold text-sm rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer">Create</button>
                 <a href="/produk" class="text-sm text-blue-500 hover:underline">Back to catalog</a>
             </div>
         </form>

@@ -9,17 +9,21 @@
     <script src="<?= base_url('assets/js/pristine.js') ?>"></script>
 </head>
 
-<body class="flex flex-col min-h-screen bg-gray-50">
-    <main class="flex flex-grow container mx-auto p-4">
-        <aside class="w-1/4 p-4">
+<body class="flex flex-col bg-gray-50">
+    <header>
+        <?= $this->include('components/header'); ?>
+    </header>
+
+    <main class="flex flex-grow container mx-auto">
+        <aside class="w-sm p-6">
             <?= $this->include('components/sidebar'); ?>
         </aside>
-        <section class="w-3/4 p-4">
+        <section class="w-full p-6">
             <?= $this->renderSection('content'); ?>
         </section>
     </main>
 
-    <footer>
+    <footer class="bg-white rounded-lg shadow-sm m-4">
         <?= $this->include('components/footer'); ?>
     </footer>
 

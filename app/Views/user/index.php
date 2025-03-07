@@ -4,11 +4,10 @@
 <?= $this->extend('layouts/admin_layout'); ?>
 
 <?= $this->section('content'); ?>
-<div class="max-w-screen-xl mx-auto p-4 mb-8">
-    <div class="bg-white shadow-sm rounded-lg p-6">
+<div class="w-full max-w-screen-xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg p-8">
         <h1 class="text-2xl font-bold mb-4">User List</h1>
         <form action="<?= $baseURL; ?>" method="get" class="mb-6">
-
             <div class="flex-wrap items-center gap-4">
                 <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
                 <div class="relative">
@@ -94,7 +93,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <a href="<?= $params->getSortUrl('last_login', $baseURL) ?>">
                                 Last Login <?= $params->isSortedBy('last_login') ? ($params->getSortDirection() == 'asc' ?
-                                            '↑' : '↓') : '' ?>
+                                                '↑' : '↓') : '' ?>
                             </a>
 
                         </th>
@@ -123,7 +122,7 @@
                                 <?= $user->status_cell ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <?= $user->timesAgo() ?>
+                                <?= $user->last_login->humanize() ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <a href="/user/profile/<?= $user->id ?>" class="inline-block px-4 py-2 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-md border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
@@ -149,9 +148,9 @@
                 <?= $pager->links('users', 'custom_pager'); ?>
             </div>
 
-            <div class="text-center">
+            <div class="text-center mt-2">
                 <small>
-                    Showing <?= count($users) ?> from <?= $total ?> total data (Page <?= $params->page ?>)
+                    Showing <?= count($users) ?> of <?= $total ?> total data (Page <?= $params->page ?>)
                 </small>
             </div>
         </div>
