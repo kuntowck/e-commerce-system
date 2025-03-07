@@ -3,12 +3,11 @@
 namespace App\Entities;
 
 use CodeIgniter\Entity\Entity;
-use CodeIgniter\I18n\Time;
 
 class User extends Entity
 {
     protected $datamap = [];
-    protected $dates   = ['created_at', 'updated_at', 'deleted_at'];
+    protected $dates   = ['last_login', 'created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [
         'last_login' => 'datetime',
         'created_at' => 'datetime',
@@ -47,16 +46,8 @@ class User extends Entity
         return $this->attributes['full_name'];
     }
 
-    public function getFormattedLastLogin(string $last_login)
+    public function getFormattedLastLogin()
     {
-        $time = Time::parse($last_login);
-
-        return $time->toLocalizedString('yyyy-MM-dd HH:mm:ss');
-    }
-
-    public function timesAgo()
-    {
-
         $timestamp = strtotime($this->attributes['last_login']);
         $timeDiff = time() - $timestamp;
 

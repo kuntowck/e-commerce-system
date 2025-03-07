@@ -50,9 +50,6 @@
                     name="email"
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     data-pristine-required
-                    data-pristine-required-message="Email is required"
-                    data-pristine-type="email"
-                    data-pristine-type-message="Please provide a valid email address."
                     value="<?= old('email') ?>">
 
                 <div class="text-red-800 text-xs font-medium mt-2">

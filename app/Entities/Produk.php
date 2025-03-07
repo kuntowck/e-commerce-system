@@ -28,8 +28,12 @@ class Produk extends Entity
         'is_sale' => null,
     ];
 
-    public function getFormattedPrice()
+    public function getFormattedPrice($price = null)
     {
+        if (isset($price)) {
+            return 'Rp' . number_format($price, 0, ',', '.');
+        }
+
         return 'Rp' . number_format($this->attributes['price'], 0, ',', '.');
     }
 
