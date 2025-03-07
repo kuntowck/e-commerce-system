@@ -74,14 +74,6 @@ class M_Produk extends Model
         return $this->where('stock <', $threshold)->countAllResults();
     }
 
-    public function getProductJoinCategoriesImages()
-    {
-        return $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
-            ->join('categories', 'categories.id = products.category_id')
-            ->join('product_images', 'product_images.product_id = products.id', 'left')
-            ->where('product_images.is_primary', 1);
-    }
-
     public function getProductsByCategory($category)
     {
         return $this->where('category', $category)->findAll();
@@ -101,30 +93,17 @@ class M_Produk extends Model
         return $productStats;
     }
 
-    public function getCategoriesByProductId($productId)
+    public function getProductJoinCategoriesImages()
     {
-        $categories = [
-            1 => ['Makanan', 'Rice'],
-            2 => ['Makanan', 'Sate'],
-            3 => ['Makanan', 'Snacks'],
-        ];
-
-        return $categories[$productId];
+        return $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
+            ->join('categories', 'categories.id = products.category_id')
+            ->join('product_images', 'product_images.product_id = products.id', 'left')
+            ->where('product_images.is_primary', 1);
     }
 
-    public function getFilteredProducts(DataParams $params, $catalogue = null)
-    {
-        if (isset($catalogue)) {
-            $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
-                ->join('categories', 'categories.id = products.category_id', 'left')
-                ->join('product_images', "product_images.product_id = products.id AND product_images.is_primary = 'true'", 'left')
-                ->where('products.status', "Active");
-        } else {
-            $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
-                ->join('categories', 'categories.id = products.category_id', 'left')
-                ->join('product_images', "product_images.product_id = products.id AND product_images.is_primary = 'true'", 'left');
-        }
 
+    public function getFilteredProducts(DataParams $params)
+    {
         // Apply search
         if (!empty($params->search)) {
             $this->groupStart()
@@ -133,7 +112,7 @@ class M_Produk extends Model
                 ->orLike('products.status', $params->search, 'both', null, true);
 
             if (is_numeric($params->search)) {
-                $this->orWhere('CAST (products.id AS TEXT) LIKE', "%$params->search%")
+                $this->Where('CAST (products.id AS TEXT) LIKE', "%$params->search%")
                     ->orWhere('CAST (products.price AS TEXT) LIKE', "%$params->search%")
                     ->orWhere('CAST (products.stock AS TEXT) LIKE', "%$params->search%");
             }
@@ -149,38 +128,34 @@ class M_Produk extends Model
         if (!empty($params->price_range)) {
             $priceRange = $params->price_range;
 
-            if ($params->price_range == '1000000') {
-                $this->where('products.price >=', $params->price_range);
-            } else {
-                $params->price_range = explode('-', $params->price_range);
-                $this->where('products.price >=', $params->price_range[0]);
-                $this->where('products.price <=', $params->price_range[1]);
-            }
+            $params->price_range = explode('-', $params->price_range);
+            $this->where('products.price >=', $params->price_range[0]);
+            $this->where('products.price <=', $params->price_range[1]);
 
             $params->price_range = $priceRange;
         }
 
-        $allowedSortColumns = ['id', 'name', 'description', 'price', 'stock', 'status', 'category_id', 'category_name', 'image_path', 'created_at'];
+        $allowedSortColumns = ['id', 'name', 'price', 'created_at'];
+
         $sort = in_array($params->sort, $allowedSortColumns) ? $params->sort : 'id';
         $order = ($params->order === 'desc') ? 'desc' : 'asc';
 
         $this->orderBy($sort, $order);
-        $result = [
-            'products' => $this->paginate($params->perPage, 'products', $params->page),
+
+        return [
+            'products' => $this->getProductJoinCategoriesImages()
+                ->paginate($params->perPage, 'products', $params->page),
             'pager' => $this->pager,
             'total' => $this->countAllResults(false),
         ];
-
-        return $result;
     }
 
-    public function getAllStatus()
+    public function getAllPriceRange()
     {
-        $statuses = $this->select('status')->distinct()->findAll();
-        return array_column($statuses, 'status');
+        return ['0-25000', '25000-50000', '50000-100000', '100000-200000'];
     }
 
-    public function getAllCategories()
+    public function getProductJoinCategories()
     {
         return $this->select('products.*, categories.name as category_name')
             ->join('categories', 'categories.id = products.category_id',);

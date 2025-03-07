@@ -39,7 +39,6 @@ class Produk extends ResourceController
             'total' => $result['total'],
             'params' => $params,
             'categories' => $this->categoryModel->findAll(),
-            'statuses' => $this->produkModel->getAllStatus(),
             'baseURL' => base_url('produk'),
         ];
 
@@ -105,45 +104,58 @@ class Produk extends ResourceController
     {
         $parser = service('parser');
 
-        $products = $this->produkModel->asArray()->findAll();
-        $inputSearch = $this->request->getGet("search");
-        $categoryFilter = $this->request->getGet("category");
+        $params = new DataParams([
+            'search' => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "order" => $this->request->getGet("order"),
+            "perPage" => $this->request->getGet("perPage"),
+            "page" => $this->request->getGet("page_products"),
+            'price_range' => $this->request->getGet('price_range'),
+            'category_id' => $this->request->getGet("category_id"),
+        ]);
 
-        $cacheKey = 'product_list_search_filter' . md5($inputSearch . '_' . $categoryFilter);
+        $results = $this->produkModel->asArray()->getFilteredProducts($params);
 
-        if ($inputSearch) {
-            $products = array_filter($products, function ($product) use ($inputSearch) {
-                return stripos($product['name'], $inputSearch) !== false;
-            });
+        foreach ($results['products'] as &$product) {
+            $product['price'] = $this->produkEntity->getFormattedPrice($product['price']);
+            $product['category'] = $product['category_name'];
+            $product['image_path'] = base_url('assets/img/' . $product['image_path']);
+            $product['badgeNew'] = $product['is_new'] ? view_cell('BadgeCell', ['text' => 'New']) : '';
+            $product['badgeSale'] = $product['is_sale'] ? view_cell('BadgeCell', ['text' => 'Sale']) : '';
         }
 
-        if ($categoryFilter && $categoryFilter !== 'All') {
-            $products = array_filter($products, function ($product) use ($categoryFilter) {
-                $categories = $this->categoryModel->find($product['id']);
-
-                return in_array($categoryFilter, $categories);
-            });
-        }
-
-        foreach ($products as $key => &$product) {
-            $product['price'] = number_format($product['price'], 0, ',', '.');
-            $product['stockStatus'] = $product['stock'] > 0 ? 'Available' : 'Out of Stock';
-            $product['category'] = [$this->categoryModel->find($product['id'])];
-
-            if ($key === count($products) - 1) {
-                $product['badgeCell'] = view_cell('BadgeCell', ['text' => 'Sale']);
-            } else {
-                $product['badgeCell'] = view_cell('BadgeCell', ['text' => 'New']);
-            }
-        }
+        $dataParser = [
+            'products' => $results['products'],
+            'tableHeaderPrice' => [
+                'name' => 'Price',
+                'href' => $params->getSortUrl('price', base_url('produk')),
+                'is_sorted' => $params->isSortedBy('price') ? ($params->getSortDirection() == 'asc' ? '↑' : '↓') : ''
+            ],
+            'tableHeaderName' => [
+                'name' => 'Name',
+                'href' => $params->getSortUrl('name', base_url('produk')),
+                'is_sorted' => $params->isSortedBy('name') ? ($params->getSortDirection() == 'asc' ? '↑' : '↓') : ''
+            ],
+            'tableHeaderDate' => [
+                'name' => 'Created at',
+                'href' => $params->getSortUrl('created_at', base_url('produk')),
+                'is_sorted' => $params->isSortedBy('created_at') ? ($params->getSortDirection() == 'asc' ? '↑' : '↓') : ''
+            ]
+        ];
 
         $data = [
             'title' => 'Product Catalog',
-            'products' => $products,
+            'params' => $params,
+            'pager' => $results['pager'],
+            'total' => $results['total'],
+            'countData' => count($results['products']),
+            'categories' => $this->produkModel->getProductJoinCategories()->findAll(),
+            'priceRange' => $this->produkModel->getAllPriceRange(),
+            'baseURL' => base_url('product/list'),
         ];
-        $data['content'] = $parser->setData($data)->render('components/parser_product_list');
 
-        cache()->save($cacheKey, $data['content'], 3600);
+        $data['content'] = $parser->setData($dataParser)->render('components/parser_product_list');
+
         return view('produk/product_list', $data);
     }
 }
