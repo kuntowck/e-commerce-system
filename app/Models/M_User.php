@@ -109,14 +109,6 @@ class M_User extends Model
             ->update();
     }
 
-    public function setAdminRole()
-    {
-        $this->session = session();
-
-        $this->session->set('role', 'admin');
-        $this->session->set('isLoggedIn', true);
-    }
-
     public function getFilteredUsers(DataParams $params)
     {
         // Apply search

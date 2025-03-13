@@ -3,6 +3,7 @@
 namespace Config;
 
 use App\Filters\AdminFilter;
+use App\Filters\RoleFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -35,7 +36,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'admin'          => AdminFilter::class,
+        'role'          => RoleFilter::class
     ];
 
     /**
@@ -105,7 +106,5 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [
-        'admin' => ['before' => ['admin/*']], // Terapkan filter admin untuk rute admin
-    ];
+    public array $filters = [];
 }
