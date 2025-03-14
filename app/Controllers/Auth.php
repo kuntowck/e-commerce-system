@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\M_User;
 use Myth\Auth\Controllers\AuthController as MythAuthController;
 use Myth\Auth\Models\UserModel;
 use Myth\Auth\Models\GroupModel;
@@ -9,10 +10,7 @@ use Myth\Auth\Models\GroupModel;
 class Auth extends MythAuthController
 
 {
-    protected $auth;
-    protected $config;
-    protected $userModel;
-    protected $groupModel;
+    protected $auth, $config, $userModel, $groupModel, $mUser;
 
     public function __construct()
     {
@@ -20,6 +18,7 @@ class Auth extends MythAuthController
 
         $this->userModel = new UserModel();
         $this->groupModel = new GroupModel();
+        $this->mUser = new M_User();
 
         $this->auth = service('authentication');
     }
@@ -54,6 +53,7 @@ class Auth extends MythAuthController
             return redirect()->back();
         }
 
+        $this->mUser->updateLastLogin($userId);
         $userGroups = $this->groupModel->getGroupsForUser($userId);
 
         foreach ($userGroups as $group) {

@@ -5,15 +5,19 @@ namespace App\Controllers;
 use App\Models\M_User;
 use App\Entities\User as UserEntity;
 use App\Libraries\DataParams;
+use Myth\Auth\Models\GroupModel;
+use Myth\Auth\Models\UserModel;
 
 class User extends BaseController
 {
-    private $userModel, $userEntity;
+    private $userModel, $mUser, $userEntity, $groupModel;
 
     public function __construct()
     {
         $this->userModel = new M_User;
+        $this->mUser = new UserModel();
         $this->userEntity = new UserEntity;
+        $this->groupModel = new GroupModel();
     }
 
     public function index()
@@ -33,17 +37,18 @@ class User extends BaseController
         $results = $this->userModel->getFilteredUsers($params);
 
         foreach ($results['users'] as &$user) {
-            $user->status_cell = view_cell('BadgeCell', ['text' => $user->status]);
+            $user->groups = $this->groupModel->getGroupsForUser($user->id)[0];
         }
 
         $data = [
+            'title' => 'User Management',
             'users' => $results['users'],
             'pager' => $results['pager'],
             'total' => $results['total'],
             'params' => $params,
-            'roles' => $this->userModel->getAllRoles(),
+            'roles' =>  $this->groupModel->findAll(),
             'statuses' => $this->userModel->getAllStatus(),
-            'baseURL' => base_url('admin/user')
+            'baseURL' => base_url('admin/users')
         ];
 
         $output = view('user/index', $data);
@@ -55,7 +60,12 @@ class User extends BaseController
     {
         $user = $this->userModel->find($id);
 
-        return view('user/detail', ['users' => $user]);
+        $data = [
+            'title' => 'Detail User',
+            'users' => $user
+        ];
+
+        return view('user/profile', $data);
     }
 
     public function profile($id)
@@ -63,10 +73,9 @@ class User extends BaseController
         $parser = service('parser');
 
         $user = $this->userModel->asArray()->find($id);
-        $this->userModel->updateLastLogin($id);
 
         $data = [
-            'title' => 'User Detail',
+            'title' => 'User Profile',
             'user' => [$user],
             'userProfileCell' => [
                 [
@@ -84,47 +93,136 @@ class User extends BaseController
 
     public function new()
     {
-        return view('user/create');
+        $data = [
+            'title' => 'Create User',
+            'roles' =>  $this->groupModel->findAll(),
+        ];
+
+        return view('user/create', $data);
     }
 
     public function create()
     {
-        $dataUser = $this->request->getPost();
-        $dataUser['password'] = $this->userEntity->setPassword($dataUser['password']);
+        $user = new \Myth\Auth\Entities\User();
 
-        if (!$this->userModel->save($dataUser)) {
-            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+        $user->username = $this->request->getVar('username');
+        $user->email = $this->request->getVar('email');
+        $user->full_name = $this->request->getVar('full_name');
+        $user->password = $this->request->getVar('password');
+        $user->active = 1;
+
+        if (!$this->mUser->save($user)) {
+            return redirect()->back()->withInput()->with('errors', $this->mUser->errors());
         }
 
-        return redirect()->to('admin/user');
+        // tambahkan user ke dalam group
+        $newUser = $this->mUser->where('email', $user->email)->first();
+        $userId = $newUser->id;
+
+        $groupId = $this->request->getVar('group');
+        $this->groupModel->addUserToGroup($userId, $groupId);
+
+        return redirect()->to('admin/users')->with('message', 'User has been successfully added.');
     }
 
     public function edit($id)
     {
-        $user = $this->userModel->find($id);
+        $data = [
+            'title' => 'Update User',
+            'user' => $this->userModel->find($id),
+            'groups' => $this->groupModel->findAll(),
+            'userGroups' => $this->groupModel->getGroupsForUser($id),
+        ];
 
-        return view('user/update', ["user" => $user]);
+        if (empty($data['user'])) {
+            return redirect()->to('/users')->with('error', 'User is not found.');
+        }
+
+        return view('user/update', $data);
     }
 
     public function update($id)
     {
-        $dataUser = $this->request->getPost();
+        $user = $this->userModel->find($id);
 
-        $this->userModel->setValidationRule("username", "required|is_unique[users.username,id,{$id}]|min_length[3]|max_length[255]");
-        $this->userModel->setValidationRule("email", "required|is_unique[users.email,id,{$id}]|valid_email|max_length[255]");
-
-        if (!$this->userModel->update($id, $dataUser)) {
-            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+        if (!$user) {
+            return redirect()->to('/users')->with('error', 'User is not found.');
         }
 
-        return redirect()->to('admin/user');
+        $username = $this->request->getVar('username');
+        $email = $this->request->getVar('email');
+        $full_name = $this->request->getVar('full_name');
+        $password = $this->request->getVar('password');
+        $passConfirm = $this->request->getVar('pass_confirm');
+        $groupId = $this->request->getVar('group');
+
+        // check unique username
+        if ($user->username !== $username) {
+            $existingUser = $this->userModel->where('email', $username)->first();
+
+            if ($existingUser) {
+                return redirect()->back()->withInput()->with('error', 'Username already used.');
+            }
+        }
+
+        // check unique email
+        if ($user->email !== $email) {
+            $existingEmail = $this->userModel->where('email', $email)->first();
+
+            if ($existingEmail) {
+                return redirect()->back()->withInput()->with('error', 'Email already used.');
+            }
+        }
+
+        // check password = password confirm
+        if (!empty($password)) {
+            if ($password != $passConfirm) {
+                return redirect()->back()->withInput()->with('error', 'Password dan konfirmasi tidak sama');
+            }
+        }
+
+        $this->mUser->setValidationRule('id', 'required|numeric|is_natural_no_zero|is_not_unique[users.id]');
+
+        $newUser = new \Myth\Auth\Entities\User();
+
+        $newUser->id = $id;
+        $newUser->username = $username;
+        $newUser->email = $email;
+        $newUser->full_name = $full_name;
+        $newUser->active = $this->request->getVar('status') ? 1 : 0;
+
+        // Update password jika diisi
+        if (!empty($password)) {
+            $newUser->password = $password;
+        }
+
+        $this->mUser->save($newUser);
+
+        // update user ke dalam group
+        if (!empty($groupId)) {
+            $currentGroup = $this->groupModel->getGroupsForUser($id);
+
+            foreach ($currentGroup as $group) {
+                $this->groupModel->removeUserFromGroup($id, $group['group_id']);
+            }
+
+            $this->groupModel->addUserToGroup($id, $groupId);
+        }
+
+        return redirect()->to('admin/users')->with('message', 'User has been successfully updated.');
     }
 
     public function delete($id)
     {
+        $user = $this->userModel->find($id);
+
+        if (empty($user)) {
+            return redirect()->to('/users')->with('error', 'User is not found.');
+        }
+
         $this->userModel->delete($id);
 
-        return redirect()->to('admin/user');
+        return redirect()->to('admin/users')->with('message', 'User has been successfully deleted.');
     }
 
     public function settings($setting)

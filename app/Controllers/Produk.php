@@ -34,13 +34,14 @@ class Produk extends ResourceController
         $result = $this->produkModel->getFilteredProducts($params);
 
         $data = [
+            'title' => 'Product Management',
             'products' => $result['products'],
             'pager' => $result['pager'],
             'total' => $result['total'],
             'params' => $params,
             'categories' => $this->categoryModel->findAll(),
             'priceRange' => $this->produkModel->getAllPriceRange(),
-            'baseURL' => base_url('produk'),
+            'baseURL' => base_url('product-manager/products'),
         ];
 
         return view('produk/index', $data);
@@ -48,14 +49,24 @@ class Produk extends ResourceController
 
     public function show($id = null)
     {
-        $data['product'] = $this->produkModel->getProductJoinCategoriesImages()->find($id);
+        $product = $this->produkModel->getProductJoinCategoriesImages()->find($id);
+
+        $data = [
+            'title' => 'Detail Product',
+            'product' => $product
+        ];
 
         return view('produk/detail', $data);
     }
 
     public function new()
     {
-        $data['categories'] = $this->categoryModel->select('id, name')->findAll();
+        $categories = $this->categoryModel->select('id, name')->findAll();
+
+        $data = [
+            'title' => 'Add Product',
+            'categories' => $categories
+        ];
 
         return view('produk/create', $data);
     }
@@ -69,16 +80,21 @@ class Produk extends ResourceController
             return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
         }
 
-        return redirect()->to('/produk');
+        return redirect()->to('product-manager/products');
     }
 
     public function edit($id = null)
     {
         $product = $this->produkModel->find($id);
         $categories = $this->categoryModel->select('id, name')->findAll();
-        d($product);
 
-        return view('produk/update', ["product" => $product, 'categories' => $categories]);
+        $data = [
+            'title' => 'Edit Product',
+            "product" => $product,
+            'categories' => $categories
+        ];
+
+        return view('produk/update', $data);
     }
 
     public function update($id = null)
@@ -91,14 +107,14 @@ class Produk extends ResourceController
         }
 
         $this->produkModel->update($id, $dataProduct);
-        return redirect()->to('/produk');
+        return redirect()->to('product-manager/products');
     }
 
     public function delete($id = null)
     {
         $this->produkModel->delete($id);
 
-        return redirect()->to('/produk');
+        return redirect()->to('product-manager/products');
     }
 
     public function productList()
@@ -152,7 +168,7 @@ class Produk extends ResourceController
             'countData' => count($results['products']),
             'categories' => $this->produkModel->getProductJoinCategories()->findAll(),
             'priceRange' => $this->produkModel->getAllPriceRange(),
-            'baseURL' => base_url('product/list'),
+            'baseURL' => base_url('customer/catalog'),
         ];
 
         $data['content'] = $parser->setData($dataParser)->render('components/parser_product_list');

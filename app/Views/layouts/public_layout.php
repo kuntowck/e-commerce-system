@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $this->renderSection('title'); ?></title>
+    <title><?= $this->renderSection('title'); ?> Page</title>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
     <script src="<?= base_url('assets/js/pristine.js') ?>"></script>
 </head>
@@ -14,10 +14,10 @@
         <?= $this->include('components/header'); ?>
     </header>
 
-    <main class="">
-        <section class="">
+    <main>
+        <div class="w-full max-w-screen-xl mx-auto p-4">
             <?= $this->renderSection('content'); ?>
-        </section>
+        </div>
     </main>
 
     <footer class="bg-white rounded-lg shadow-sm m-4">

@@ -10,6 +10,8 @@ class BadgeCell extends Cell
 
     public function mount()
     {
+        $this->theme = 'blue';
+
         if ($this->text === 'new' || $this->text === 'New' || $this->text === 'active') {
             $this->theme = 'green';
         } else if ($this->text === 'sale' || $this->text === 'Sale' || $this->text === 'inactive') {

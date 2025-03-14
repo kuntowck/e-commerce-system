@@ -16,34 +16,70 @@ $routes->get('/home', function () {
 });
 $routes->get('/about', 'Home::about');
 
-$routes->get('/auth/admin/(:alphanum)', [Admin::class, 'role/$1']);
+$routes->group('', ['namespace' => 'App\Controllers'], function ($routes) {
+    $routes->get('register', 'Auth::register', ['as' => 'register']);
+    $routes->post('register', 'Auth::attemptRegister');
 
-$routes->resource('produk');
-$routes->get('/product/list', [Produk::class, 'productList']);
+    $routes->get('login', 'Auth::login', ['as' => 'login']);
+    $routes->post('login', 'Auth::attemptLogin');
+});
 
-$routes->group('pesanan', function ($routes) {
+// $routes->resource('produk');
+
+$routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('/', function () {
+        return redirect()->to('admin/dashboard');
+    });
+});
+
+$routes->group('product-manager', ['filter' => 'role:product-manager'], function ($routes) {
+    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('/', function () {
+        return redirect()->to('admin/dashboard');
+    });
+});
+
+$routes->group('customer', ['filter' => 'role:customer'], function ($routes) {
+    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('/', function () {
+        return redirect()->to('admin/dashboard');
+    });
+});
+
+$routes->group('admin/users', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('/', 'User::index');
+    $routes->get('new', 'User::new');
+    $routes->post('new', 'User::create');
+    $routes->get('detail/(:num)', 'User::show/$1');
+    $routes->get('update/(:num)', 'User::edit/$1');
+    $routes->put('update/(:num)', 'User::update/$1');
+    $routes->delete('delete/(:num)', 'User::delete/$1');
+});
+
+$routes->group('product-manager/products', ['filter' => 'role:product-manager,admin'], function ($routes) {
+    $routes->get('/', 'Produk::index');
+    $routes->get('(:num)/show', 'Produk::show/$1');
+    $routes->get('new', 'Produk::new');
+    $routes->post('new', 'Produk::create');
+    $routes->get('(:num)/edit', 'Produk::edit/$1');
+    $routes->put('(:num)/update', 'Produk::update/$1');
+    $routes->delete('(:num)/delete', 'Produk::delete/$1');
+});
+
+$routes->group('product-manager/orders', ['filter' => 'role:product-manager,admin'], function ($routes) {
     $routes->get('/', [Pesanan::class, 'index'], ['as' => 'pesanan_list']);
     $routes->get('detail/(:num)', [Pesanan::class, 'detail/$1'], ['as' => 'pesanan_details']);
-    $routes->get('create', [Pesanan::class, 'create']);
-    $routes->post('create', [Pesanan::class, 'store'], ['method' => 'post']);
     $routes->get('update/(:num)', [Pesanan::class, 'editStatus/$1']);
     $routes->put('update/(:num)', [Pesanan::class, 'updateStatus/$1'], ['method' => 'put']);
     $routes->delete('delete/(:num)', [Pesanan::class, 'delete/$1'], ['method' => 'delete']);
 });
 
-$routes->group('user', function ($routes) {
-    $routes->get('profile/(:num)', [User::class, 'profile/$1']);
-    $routes->get('settings/(:alpha)', [User::class, 'settings/$1']);
-});
-
-$routes->group('admin', ['filter' => 'admin'], function ($routes) {
-    $routes->get('dashboard', [Admin::class, 'dashboard']);
-    $routes->get('user', [User::class, 'index'], ['as' => 'user_list']);
-    $routes->get('user/new', [User::class, 'new']);
-    $routes->post('user/new', [User::class, 'create'], ['method' => 'post']);
-    $routes->get('user/update/(:num)', [User::class, 'edit/$1']);
-    $routes->put('user/update/(:num)', [User::class, 'update/$1'], ['method' => 'put']);
-    $routes->delete('user/delete/(:num)', [User::class, 'delete/$1'], ['method' => 'delete']);
+$routes->group('customer', ['filter' => 'role:customer,admin'], function ($routes) {
+    $routes->get('profile/(:num)', 'User::profile/$1');
+    $routes->get('catalog', 'Produk::productList');
+    $routes->get('cart', 'Pesanan::create');
+    $routes->post('cart', 'Pesanan::store');
 });
 
 $routes->group('api', function ($routes) {

@@ -16,7 +16,7 @@ class M_User extends Model
     protected $returnType       = \App\Entities\User::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'username', 'email', 'password', 'full_name', 'role', 'status', 'last_login'];
+    protected $allowedFields    = ['id', 'username', 'email', 'password', 'full_name', 'status', 'last_login'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -109,6 +109,13 @@ class M_User extends Model
             ->update();
     }
 
+    public function getUserJoinGroup()
+    {
+        return $this->select('users.*, auth_groups_users.*, auth_groups.name as group_name')
+            ->join('auth_groups_users', 'auth_groups_users.user_id = users.id', 'left')
+            ->join('auth_groups', 'auth_groups_users.group_id = auth_groups.id', 'left')->asObject();
+    }
+
     public function getFilteredUsers(DataParams $params)
     {
         // Apply search
@@ -117,7 +124,6 @@ class M_User extends Model
                 ->like('full_name', $params->search, 'both', null, true)
                 ->orLike('username', $params->search, 'both', null, true)
                 ->orLike('email', $params->search, 'both', null, true)
-                ->orLike('role', $params->search, 'both', null, true)
                 ->orLike('status', $params->search, 'both', null, true);
 
             if (is_numeric($params->search)) {
@@ -128,7 +134,8 @@ class M_User extends Model
 
         // Apply role filter
         if (!empty($params->role)) {
-            $this->where('role', $params->role);
+            $this->getUserJoinGroup()
+                ->where('group_id', $params->role);
         }
 
         // Apply status filter
