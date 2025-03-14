@@ -2,6 +2,9 @@
 
 namespace App\Controllers;
 
+use Config\View;
+use SebastianBergmann\Type\VoidType;
+
 class Home extends BaseController
 {
     public function index()
@@ -13,8 +16,22 @@ class Home extends BaseController
         return view('home', $data);
     }
 
-    public function about()
+    public function dashboardProductManager()
     {
-        return view('about');
+        $data = [
+            'title' => 'Dashboard'
+        ];
+
+        return View('components/dashboard', $data);
     }
+
+    public function dashboardCustomer()
+    {
+        $data = [
+            'title' => 'Dashboard'
+        ];
+
+        return View('components/dashboard', $data);
+    }
+
 }

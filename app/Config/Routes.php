@@ -34,14 +34,14 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 });
 
 $routes->group('product-manager', ['filter' => 'role:product-manager'], function ($routes) {
-    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('dashboard', 'Home::dashboardProductManager');
     $routes->get('/', function () {
         return redirect()->to('admin/dashboard');
     });
 });
 
 $routes->group('customer', ['filter' => 'role:customer'], function ($routes) {
-    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('dashboard', 'Home::dashboardCustomer');
     $routes->get('/', function () {
         return redirect()->to('admin/dashboard');
     });
