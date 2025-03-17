@@ -1,11 +1,11 @@
 <?php
 
 use CodeIgniter\Router\RouteCollection;
-use App\Controllers\Produk;
 use App\Controllers\Pesanan;
+use App\Controllers\Api;
+use App\Controllers\Produk;
 use App\Controllers\User;
 use App\Controllers\Admin;
-use App\Controllers\Api;
 
 /**
  * @var RouteCollection $routes
@@ -14,7 +14,6 @@ $routes->get('/', 'Home::index');
 $routes->get('/home', function () {
     return redirect()->to('/');
 });
-$routes->get('/about', 'Home::about');
 
 $routes->group('', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('register', 'Auth::register', ['as' => 'register']);
@@ -27,7 +26,7 @@ $routes->group('', ['namespace' => 'App\Controllers'], function ($routes) {
 // $routes->resource('produk');
 
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
-    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('dashboard', 'Admin::index');
     $routes->get('/', function () {
         return redirect()->to('admin/dashboard');
     });
@@ -36,14 +35,14 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 $routes->group('product-manager', ['filter' => 'role:product-manager'], function ($routes) {
     $routes->get('dashboard', 'Home::dashboardProductManager');
     $routes->get('/', function () {
-        return redirect()->to('admin/dashboard');
+        return redirect()->to('product-manager/dashboard');
     });
 });
 
 $routes->group('customer', ['filter' => 'role:customer'], function ($routes) {
     $routes->get('dashboard', 'Home::dashboardCustomer');
     $routes->get('/', function () {
-        return redirect()->to('admin/dashboard');
+        return redirect()->to('customer/dashboard');
     });
 });
 
@@ -51,10 +50,20 @@ $routes->group('admin/users', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('/', 'User::index');
     $routes->get('new', 'User::new');
     $routes->post('new', 'User::create');
-    $routes->get('detail/(:num)', 'User::show/$1');
+    $routes->get('detail/(:num)', 'User::profile/$1');
     $routes->get('update/(:num)', 'User::edit/$1');
     $routes->put('update/(:num)', 'User::update/$1');
     $routes->delete('delete/(:num)', 'User::delete/$1');
+});
+
+$routes->group('admin/roles', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('/', 'Role::index');
+    $routes->get('new', 'Role::new');
+    $routes->post('new', 'Role::create');
+    $routes->get('detail/(:num)', 'Role::show/$1');
+    $routes->get('update/(:num)', 'Role::edit/$1');
+    $routes->put('update/(:num)', 'Role::update/$1');
+    $routes->delete('delete/(:num)', 'Role::delete/$1');
 });
 
 $routes->group('product-manager/products', ['filter' => 'role:product-manager,admin'], function ($routes) {
