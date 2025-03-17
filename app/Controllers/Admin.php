@@ -19,15 +19,6 @@ class Admin extends BaseController
 
     public function index()
     {
-        $dataUser = $this->userModel->findAll();
-
-        $output = view('user/index', ['users' => $dataUser]);
-        cache()->save('admin_user_list', $output, 900);
-        return $output;
-    }
-
-    public function dashboard()
-    {
         $parser = service('parser');
 
         $users = $this->userModel->getUserStatistics();

@@ -8,11 +8,6 @@ class UserProfileCell extends Cell
 {
     protected $text, $date;
 
-    public function mount()
-    {
-        $this->date = date('d/m/Y - H:i:s');
-    }
-
     public function getTextProperty()
     {
         return $this->text;

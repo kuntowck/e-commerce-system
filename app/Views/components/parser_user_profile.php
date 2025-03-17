@@ -4,18 +4,18 @@
         {user}
         <div class="mb-4">
             <h1 class="text-lg font-bold mb-2">Profile</h1>
-            <p class="text-md font-semibold">
-                Name:
-                <span class="text-gray-500">{full_name}</span>
-            </p>
-            <p class="text-md font-semibold">
-                Email:
+            <div>
+                <span class="font-semibold">Name: </span>
+                <span class="font-regular text-gray-500">{full_name}</span>
+            </div>
+            <div>
+                <span class="font-semibold">Email: </span>
                 <span class="text-gray-500">{email}</span>
-            </p>
-            <p class="text-md font-semibold">
-                Role:
-                <span class="text-gray-500">{role}</span>
-            </p>
+            </div>
+            <div>
+                <span class="font-semibold">Role: </span>
+                <span class="text-gray-500">{!role!}</span>
+            </div>
         </div>
         {/user}
         <div class="mb-4">
@@ -24,15 +24,15 @@
             <div class="overflow-x-auto">
                 <div class="mb-2">{!login!}</div>
                 <div class="mb-2">{!updated!}</div>
-                <div class="mb-2">{!ordered!}</div>
+                <div class="mb-2">{!created!}</div>
             </div>
             {/userProfileCell}
         </div>
         <div class="mb-4">
             <h1 class="text-lg font-bold mb-2">Account Status</h1>
             <div class="overflow-x-auto">
-                <p class="text-md font-semibold">Account status:
-                    <span class="text-gray-500">{accountStatus}</span>
+                <p class="font-semibold">Account status:
+                    <span class="text-gray-500">{!accountStatus!}</span>
                 </p>
             </div>
         </div>
