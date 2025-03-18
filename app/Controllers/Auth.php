@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\M_User;
 use Myth\Auth\Controllers\AuthController as MythAuthController;
-use Myth\Auth\Models\UserModel;
 use Myth\Auth\Models\GroupModel;
 
 class Auth extends MythAuthController
@@ -16,9 +15,8 @@ class Auth extends MythAuthController
     {
         parent::__construct();
 
-        $this->userModel = new UserModel();
+        $this->userModel = new M_User();
         $this->groupModel = new GroupModel();
-        $this->mUser = new M_User();
 
         $this->auth = service('authentication');
     }
@@ -32,6 +30,10 @@ class Auth extends MythAuthController
     {
         parent::attemptLogin();
 
+        if (!user_id()) {
+            return redirect()->back()->withInput()->with('error', 'Please check your credentials.');
+        }
+
         return $this->redirectBasedOnRole();
     }
 
@@ -42,7 +44,24 @@ class Auth extends MythAuthController
 
     public function attemptRegister()
     {
-        return parent::attemptRegister();
+        parent::attemptRegister();
+
+        if ($this->users->errors()) {
+            return redirect()->back()->withInput()->with('errors', $this->users->errors());
+        }
+
+        $email = $this->request->getPost('email');
+        $user = $this->userModel->where('email', $email)->first();
+
+        if ($user) {
+            $customerGroup = $this->groupModel->where('name', 'customer')->first();
+
+            if ($customerGroup) {
+                $this->groupModel->addUserToGroup($user->id, $customerGroup->id);
+            }
+        }
+
+        return redirect()->route('login')->with('message', lang('Auth.activationSuccess'));
     }
 
     private function redirectBasedOnRole()
@@ -53,7 +72,8 @@ class Auth extends MythAuthController
             return redirect()->back();
         }
 
-        $this->mUser->updateLastLogin($userId);
+        $this->userModel->updateLastLogin($userId);
+
         $userGroups = $this->groupModel->getGroupsForUser($userId);
 
         foreach ($userGroups as $group) {

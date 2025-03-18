@@ -4,19 +4,17 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 use App\Libraries\DataParams;
-use CodeIgniter\I18n\Time;
+use Myth\Auth\Models\UserModel as MythModel;
 
-class M_User extends Model
+class M_User extends MythModel
 {
-    private $session;
-
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = \App\Entities\User::class;
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'username', 'email', 'password', 'full_name', 'status', 'last_login'];
+    protected $allowedFields    = ['id', 'email', 'username', 'full_name', 'password_hash', 'reset_hash', 'reset_at', 'reset_expires', 'activate_hash', 'status', 'status_message', 'active', 'force_pass_reset', 'last_login'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -33,26 +31,9 @@ class M_User extends Model
 
     // Validation
     protected $validationRules = [
-        'username' => 'required|is_unique[users.username]|min_length[3]',
-        'email'    => 'required|valid_email|is_unique[users.email]',
-        'password' => 'required|min_length[8]',
+        'full_name' => 'required|min_length[3]|max_length[100]'
     ];
-    protected $validationMessages = [
-        'username' => [
-            'required'   => 'Username is required.',
-            'is_unique'  => 'Username must be unique.',
-            'min_length' => 'Username must be at least 3 characters long.',
-        ],
-        'email' => [
-            'required'    => 'Email is required.',
-            'valid_email' => 'Please provide a valid email address.',
-            'is_unique'   => 'Email must be unique.',
-        ],
-        'password' => [
-            'required'   => 'Password is required.',
-            'min_length' => 'Password must be at least 8 characters long.',
-        ],
-    ];
+    protected $validationMessages = [];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -111,9 +92,9 @@ class M_User extends Model
 
     public function getUserJoinGroup()
     {
-        return $this->select('users.*, auth_groups_users.*, auth_groups.name as group_name')
+        return $this->select('users.id, email, username, full_name, status, last_login, auth_groups_users.group_id, auth_groups.name as group_name')
             ->join('auth_groups_users', 'auth_groups_users.user_id = users.id', 'left')
-            ->join('auth_groups', 'auth_groups_users.group_id = auth_groups.id', 'left')->asObject();
+            ->join('auth_groups', 'auth_groups.id = auth_groups_users.group_id', 'left')->asObject();
     }
 
     public function getFilteredUsers(DataParams $params)

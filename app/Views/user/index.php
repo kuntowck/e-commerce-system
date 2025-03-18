@@ -137,7 +137,7 @@
                             <?= view_cell('BadgeCell', ['text' => $user->status]) ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <?= isset($user->last_login) ?? $user->last_login  ?>
+                            <?= isset($user->last_login) ? $user->last_login->humanize() : $user->last_login ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <a href="<?= base_url('admin/users/detail/' . $user->id) ?>" class="inline-block px-4 py-2 text-xs font-medium text-gray-900 focus:outline-none bg-white rounded-md border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">

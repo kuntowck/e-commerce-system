@@ -6,24 +6,19 @@ use App\Models\M_User;
 use App\Entities\User as UserEntity;
 use App\Libraries\DataParams;
 use Myth\Auth\Models\GroupModel;
-use Myth\Auth\Models\UserModel;
 
 class User extends BaseController
 {
-    private $userModel, $mUser, $userEntity, $groupModel;
+    private $userModel, $groupModel;
 
     public function __construct()
     {
         $this->userModel = new M_User;
-        $this->mUser = new UserModel();
-        $this->userEntity = new UserEntity;
         $this->groupModel = new GroupModel();
     }
 
     public function index()
     {
-        $data['user'] = $this->userModel->findAll();
-
         $params = new DataParams([
             'search' => $this->request->getGet('search'),
             'role' => $this->request->getGet('role'),
@@ -72,19 +67,27 @@ class User extends BaseController
     {
         $parser = service('parser');
 
-        $user = $this->userModel->asArray()->find($id);
+        $user = $this->userModel->getUserJoinGroup()->where('user_id', $id)->first();
+        $activityHistory = $this->userModel->select('last_login, updated_at,created_at')->where('id', $id)->first();
 
         $data = [
             'title' => 'User Profile',
-            'user' => [$user],
-            'userProfileCell' => [
+            'user' => [
                 [
-                    'login' => view_cell('UserProfileCell', ['text' => 'Logged in'], 300, 'user_profile_cell'),
-                    'updated' => view_cell('UserProfileCell', ['text' => 'Updated profile']),
-                    'ordered' => view_cell('UserProfileCell', ['text' => 'Place an order'])
+                    'email' => $user->email,
+                    'username' => $user->username,
+                    'full_name' => $user->full_name,
+                    'role' => view_cell('BadgeCell', ['text' => $user->group_name])
                 ]
             ],
-            'accountStatus' => $user['status'],
+            'userProfileCell' => [
+                [
+                    'login' => view_cell('UserProfileCell', ['text' => 'Logged in', 'date' => $activityHistory->last_login]),
+                    'updated' => view_cell('UserProfileCell', ['text' => 'Updated profile', 'date' => $activityHistory->updated_at]),
+                    'created' => view_cell('UserProfileCell', ['text' => 'Created profile', 'date' => $activityHistory->created_at]),
+                ]
+            ],
+            'accountStatus' => view_cell('BadgeCell', ['text' => $user->status])
         ];
         $data['content'] = $parser->setData($data)->render('components/parser_user_profile');
 
@@ -111,12 +114,12 @@ class User extends BaseController
         $user->password = $this->request->getVar('password');
         $user->active = 1;
 
-        if (!$this->mUser->save($user)) {
-            return redirect()->back()->withInput()->with('errors', $this->mUser->errors());
+        if (!$this->userModel->save($user)) {
+            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
         }
 
         // tambahkan user ke dalam group
-        $newUser = $this->mUser->where('email', $user->email)->first();
+        $newUser = $this->userModel->where('email', $user->email)->first();
         $userId = $newUser->id;
 
         $groupId = $this->request->getVar('group');
@@ -181,8 +184,6 @@ class User extends BaseController
             }
         }
 
-        $this->mUser->setValidationRule('id', 'required|numeric|is_natural_no_zero|is_not_unique[users.id]');
-
         $newUser = new \Myth\Auth\Entities\User();
 
         $newUser->id = $id;
@@ -196,7 +197,9 @@ class User extends BaseController
             $newUser->password = $password;
         }
 
-        $this->mUser->save($newUser);
+        if (!$this->userModel->save($newUser)) {
+            return redirect()->back()->withInput()->with('errors', $this->userModel->errors());
+        }
 
         // update user ke dalam group
         if (!empty($groupId)) {
