@@ -6,17 +6,19 @@ use App\Models\M_Produk;
 use App\Entities\Produk as ProdukEntity;
 use App\Libraries\DataParams;
 use App\Models\M_Category;
-use CodeIgniter\RESTful\ResourceController;
+use App\Models\M_ProductImage;
+use App\Models\M_User;
 
-class Produk extends ResourceController
+class Produk extends BaseController
 {
-    protected $produkModel, $produkEntity, $categoryModel;
+    protected $produkModel, $produkEntity, $categoryModel, $productImageModel;
 
     public function __construct()
     {
         $this->produkModel = new M_Produk();
         $this->produkEntity = new ProdukEntity();
         $this->categoryModel = new M_Category();
+        $this->productImageModel = new M_ProductImage();
     }
 
     public function index()
@@ -80,18 +82,28 @@ class Produk extends ResourceController
             return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
         }
 
-        return redirect()->to('product-manager/products');
+        $product_id = $this->produkModel->getInsertID();
+
+        // $this->uploadProductImage($product_id);
+
+        $addedProduct = $this->produkModel->getProductJoinCategoriesImages()->where('products.id', $product_id)->first();
+
+        $this->sendEmail($addedProduct);
+
+        return redirect()->to('product-manager/products')->with('message', 'Product has been successfully added,  and a notification email has been sent.');;
     }
 
     public function edit($id = null)
     {
         $product = $this->produkModel->find($id);
         $categories = $this->categoryModel->select('id, name')->findAll();
+        $productImage = $this->productImageModel->where('product_id', $product->id)->first();
 
         $data = [
             'title' => 'Edit Product',
-            "product" => $product,
-            'categories' => $categories
+            'product' => $product,
+            'categories' => $categories,
+            'productImage' => $productImage
         ];
 
         return view('produk/update', $data);
@@ -102,11 +114,12 @@ class Produk extends ResourceController
         $dataProduct = $this->request->getPost();
         $dataProduct['price'] = $this->produkEntity->getPriceToInt($dataProduct['price']);
 
-        if ($this->produkModel->update($id, $dataProduct) === false) {
+        if (!$this->produkModel->update($id, $dataProduct)) {
             return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
         }
 
-        $this->produkModel->update($id, $dataProduct);
+        // $this->uploadProductImage($id);
+
         return redirect()->to('product-manager/products');
     }
 
@@ -136,7 +149,7 @@ class Produk extends ResourceController
         foreach ($results['products'] as &$product) {
             $product['price'] = $this->produkEntity->getFormattedPrice($product['price']);
             $product['category'] = $product['category_name'];
-            $product['image_path'] = base_url('assets/img/' . $product['image_path']);
+            // $product['image_path'] = base_url('uploads/product-images/' . $product['id'] . '/original/' . $product['image_path']);
             $product['badgeNew'] = $product['is_new'] ? view_cell('BadgeCell', ['text' => 'New']) : '';
             $product['badgeSale'] = $product['is_sale'] ? view_cell('BadgeCell', ['text' => 'Sale']) : '';
         }
@@ -175,4 +188,149 @@ class Produk extends ResourceController
 
         return view('produk/product_list', $data);
     }
+
+    private function sendEmail($product)
+    {
+        $userModel = new M_User();
+        $user = $userModel->where('id', user_id())->first();
+        $roles = $userModel->getUserJoinGroup()
+            ->where('auth_groups.name', 'admin')
+            ->orWhere('auth_groups.name', 'product-manager')
+            ->findAll();
+
+        $ccList = array_column($roles, 'email');
+
+        $data = [
+            'title' => 'New Prodcut has been Added',
+            'product' => $product,
+            'link' => base_url('product-manager/products/' . $product->id . '/show')
+        ];
+
+        $email = service('email');
+
+        $email->setFrom('kuntowck@gmail.com', 'E-Commerce System');
+        $email->setTo($user->email);
+        $email->setCC($ccList);
+        $email->setSubject('There is a New Product');
+        $email->setMessage(view('email/newproduct_email', $data));
+
+        $filePath = ROOTPATH . 'public/uploads/product-images/' . $product->id . '/thumbnail/' . $product->image_path;
+        if (file_exists($filePath)) {
+            $email->attach($filePath);
+        }
+
+        if (!$email->send()) {
+            return redirect()->back()->with('error', $email->printDebugger());
+        }
+    }
+
+    // private function uploadProductImage($product_id)
+    // {
+    //     $productImage = $this->productImageModel->where('product_id', $product_id)->first();
+
+    //     $validationRules = [
+    //         'imagePath' => [
+    //             'label' => 'Gambar',
+    //             'rules' => [
+    //                 'uploaded[image_path]',
+    //                 'is_image[image_path]',
+    //                 'mime_in[image_path,image/jpg,image/jpeg,image/png,image/webp]',
+    //                 'max_size[image_path,5120]', // 5MB dalam KB (5 * 1024)
+    //                 'max_dims[image_path,600,600]'
+    //             ],
+    //             'errors' => [
+    //                 'uploaded' => 'Please select a file to upload.',
+    //                 'is_image' => 'File must be image.',
+    //                 'mime_in' => 'File must be in JPG, JPEG, PNG, atau WebP format.',
+    //                 'max_size' => 'File size must not exceed 5MB.',
+    //                 'max_dims' => 'Minimum size 600x600px/'
+    //             ]
+    //         ]
+    //     ];
+
+    //     if (!$this->validate($validationRules)) {
+    //         return redirect()->back()->with(
+    //             'validation_errors',
+    //             $this->validator->getErrors()
+    //         );
+    //     }
+
+    //     $imagePath = $this->request->getFile('image_path');
+
+    //     if (!$imagePath->isValid()) {
+    //         return redirect()->back()->with(
+    //             'error',
+    //             $imagePath->getErrorString()
+    //         );
+    //     }
+
+    //     $uploadPath = FCPATH . 'uploads/product-images/' . $product_id . '/';
+
+    //     if (!is_dir($uploadPath)) {
+    //         mkdir($uploadPath, 0777, true);
+    //     }
+
+    //     $nameFile = 'product' . '_' . $product_id . '_' . date('Y-m-d_H-i-s') . '.' . $imagePath->getExtension();
+    //     $imagePath->move($uploadPath . 'original', $nameFile);
+    //     $filePath = $uploadPath . 'original/' . $nameFile;
+
+    //     $this->createImageVersions($filePath, $nameFile, $uploadPath);
+
+    //     if (!empty($productImage->is_primary)) {
+    //         $data = [
+    //             // 'id' => $productImage->id,
+    //             'product_id' => $product_id,
+    //             'image_path' => $nameFile,
+    //             'is_primary' => 0
+    //         ];
+    //     } else {
+    //         $data = [
+    //             'product_id' => $product_id,
+    //             'image_path' => $nameFile,
+    //             'is_primary' => 1
+    //         ];
+    //     }
+
+
+    //     if (!$this->productImageModel->save($data)) {
+    //         return redirect()->to('product-manager/products/new')->withInput()->with('errors', $this->produkModel->errors());
+    //     }
+    // }
+
+    // private function createImageVersions($filePath, $fileName, $uploadPath)
+    // {
+    //     $image = service('image');
+
+    //     // thumbnail (150x150px) for catalog display
+    //     $thumbnail = $uploadPath . 'thumbnail/';
+    //     if (!is_dir($thumbnail)) {
+    //         mkdir($thumbnail, 0777, true);
+    //     }
+
+    //     $image->withFile($filePath)->fit(150, 150, 'center')->save($thumbnail . $fileName);
+
+    //     // medium (500x500px) for product detail pages and add watermark
+    //     $medium = $uploadPath . 'medium/';
+    //     if (!is_dir($medium)) {
+    //         mkdir($medium, 0777, true);
+    //     }
+    //     $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
+    //         'color' => '#fff',
+    //         'opacity' => 0.8,
+    //         'withShadow' => true,
+    //         'hAlign' => 'center',
+    //         'vAlign' => 'top',
+    //         'fontSize' => 50,
+    //     ])->resize(500, 500, true, 'height')->save($medium . $fileName);
+
+    //     // compress 80% quality and add watermark
+    //     $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
+    //         'color' => '#fff',
+    //         'opacity' => 0.8,
+    //         'withShadow' => true,
+    //         'hAlign' => 'center',
+    //         'vAlign' => 'top',
+    //         'fontSize' => 50,
+    //     ])->save($filePath, 80);
+    // }
 }
