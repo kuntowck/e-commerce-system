@@ -7,7 +7,7 @@
 <div class="max-w-screen-xl mx-auto p-4 mb-10">
     <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div>
-            <img class="rounded-t-lg" src="<?= base_url('assets/img/' . $product->image_path); ?>" alt="<?= $product->image_path; ?>" />
+            <img class="rounded-t-lg" src="<?= base_url('uploads/product-images/' . $product->id . '/original/' . $product->image_path) ?>" alt="<?= $product->image_path; ?>" />
         </div>
 
         <div class="px-4 mt-4 flex gap-0">

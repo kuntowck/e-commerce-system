@@ -84,7 +84,7 @@ class Produk extends BaseController
 
         $product_id = $this->produkModel->getInsertID();
 
-        // $this->uploadProductImage($product_id);
+        $this->uploadProductImage($product_id);
 
         $addedProduct = $this->produkModel->getProductJoinCategoriesImages()->where('products.id', $product_id)->first();
 
@@ -118,7 +118,7 @@ class Produk extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->produkModel->errors());
         }
 
-        // $this->uploadProductImage($id);
+        $this->uploadProductImage($id);
 
         return redirect()->to('product-manager/products');
     }
@@ -149,7 +149,7 @@ class Produk extends BaseController
         foreach ($results['products'] as &$product) {
             $product['price'] = $this->produkEntity->getFormattedPrice($product['price']);
             $product['category'] = $product['category_name'];
-            // $product['image_path'] = base_url('uploads/product-images/' . $product['id'] . '/original/' . $product['image_path']);
+            $product['image_path'] = base_url('uploads/product-images/' . $product['id'] . '/original/' . $product['image_path']);
             $product['badgeNew'] = $product['is_new'] ? view_cell('BadgeCell', ['text' => 'New']) : '';
             $product['badgeSale'] = $product['is_sale'] ? view_cell('BadgeCell', ['text' => 'Sale']) : '';
         }
@@ -224,113 +224,113 @@ class Produk extends BaseController
         }
     }
 
-    // private function uploadProductImage($product_id)
-    // {
-    //     $productImage = $this->productImageModel->where('product_id', $product_id)->first();
+    private function uploadProductImage($product_id)
+    {
+        $productImage = $this->productImageModel->where('product_id', $product_id)->first();
 
-    //     $validationRules = [
-    //         'imagePath' => [
-    //             'label' => 'Gambar',
-    //             'rules' => [
-    //                 'uploaded[image_path]',
-    //                 'is_image[image_path]',
-    //                 'mime_in[image_path,image/jpg,image/jpeg,image/png,image/webp]',
-    //                 'max_size[image_path,5120]', // 5MB dalam KB (5 * 1024)
-    //                 'max_dims[image_path,600,600]'
-    //             ],
-    //             'errors' => [
-    //                 'uploaded' => 'Please select a file to upload.',
-    //                 'is_image' => 'File must be image.',
-    //                 'mime_in' => 'File must be in JPG, JPEG, PNG, atau WebP format.',
-    //                 'max_size' => 'File size must not exceed 5MB.',
-    //                 'max_dims' => 'Minimum size 600x600px/'
-    //             ]
-    //         ]
-    //     ];
+        $validationRules = [
+            'imagePath' => [
+                'label' => 'Gambar',
+                'rules' => [
+                    'uploaded[image_path]',
+                    'is_image[image_path]',
+                    'mime_in[image_path,image/jpg,image/jpeg,image/png,image/webp]',
+                    'max_size[image_path,5120]', // 5MB dalam KB (5 * 1024)
+                    'max_dims[image_path,600,600]'
+                ],
+                'errors' => [
+                    'uploaded' => 'Please select a file to upload.',
+                    'is_image' => 'File must be image.',
+                    'mime_in' => 'File must be in JPG, JPEG, PNG, atau WebP format.',
+                    'max_size' => 'File size must not exceed 5MB.',
+                    'max_dims' => 'Minimum size 600x600px/'
+                ]
+            ]
+        ];
 
-    //     if (!$this->validate($validationRules)) {
-    //         return redirect()->back()->with(
-    //             'validation_errors',
-    //             $this->validator->getErrors()
-    //         );
-    //     }
+        if (!$this->validate($validationRules)) {
+            return redirect()->back()->with(
+                'validation_errors',
+                $this->validator->getErrors()
+            );
+        }
 
-    //     $imagePath = $this->request->getFile('image_path');
+        $imagePath = $this->request->getFile('image_path');
 
-    //     if (!$imagePath->isValid()) {
-    //         return redirect()->back()->with(
-    //             'error',
-    //             $imagePath->getErrorString()
-    //         );
-    //     }
+        if (!$imagePath->isValid()) {
+            return redirect()->back()->with(
+                'error',
+                $imagePath->getErrorString()
+            );
+        }
 
-    //     $uploadPath = FCPATH . 'uploads/product-images/' . $product_id . '/';
+        $uploadPath = FCPATH . 'uploads/product-images/' . $product_id . '/';
 
-    //     if (!is_dir($uploadPath)) {
-    //         mkdir($uploadPath, 0777, true);
-    //     }
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0777, true);
+        }
 
-    //     $nameFile = 'product' . '_' . $product_id . '_' . date('Y-m-d_H-i-s') . '.' . $imagePath->getExtension();
-    //     $imagePath->move($uploadPath . 'original', $nameFile);
-    //     $filePath = $uploadPath . 'original/' . $nameFile;
+        $nameFile = 'product' . '_' . $product_id . '_' . date('Y-m-d_H-i-s') . '.' . $imagePath->getExtension();
+        $imagePath->move($uploadPath . 'original', $nameFile);
+        $filePath = $uploadPath . 'original/' . $nameFile;
 
-    //     $this->createImageVersions($filePath, $nameFile, $uploadPath);
+        $this->createImageVersions($filePath, $nameFile, $uploadPath);
 
-    //     if (!empty($productImage->is_primary)) {
-    //         $data = [
-    //             // 'id' => $productImage->id,
-    //             'product_id' => $product_id,
-    //             'image_path' => $nameFile,
-    //             'is_primary' => 0
-    //         ];
-    //     } else {
-    //         $data = [
-    //             'product_id' => $product_id,
-    //             'image_path' => $nameFile,
-    //             'is_primary' => 1
-    //         ];
-    //     }
+        if (!empty($productImage->is_primary)) {
+            $data = [
+                // 'id' => $productImage->id,
+                'product_id' => $product_id,
+                'image_path' => $nameFile,
+                'is_primary' => 0
+            ];
+        } else {
+            $data = [
+                'product_id' => $product_id,
+                'image_path' => $nameFile,
+                'is_primary' => 1
+            ];
+        }
 
 
-    //     if (!$this->productImageModel->save($data)) {
-    //         return redirect()->to('product-manager/products/new')->withInput()->with('errors', $this->produkModel->errors());
-    //     }
-    // }
+        if (!$this->productImageModel->save($data)) {
+            return redirect()->to('product-manager/products/new')->withInput()->with('errors', $this->produkModel->errors());
+        }
+    }
 
-    // private function createImageVersions($filePath, $fileName, $uploadPath)
-    // {
-    //     $image = service('image');
+    private function createImageVersions($filePath, $fileName, $uploadPath)
+    {
+        $image = service('image');
 
-    //     // thumbnail (150x150px) for catalog display
-    //     $thumbnail = $uploadPath . 'thumbnail/';
-    //     if (!is_dir($thumbnail)) {
-    //         mkdir($thumbnail, 0777, true);
-    //     }
+        // thumbnail (150x150px) for catalog display
+        $thumbnail = $uploadPath . 'thumbnail/';
+        if (!is_dir($thumbnail)) {
+            mkdir($thumbnail, 0777, true);
+        }
 
-    //     $image->withFile($filePath)->fit(150, 150, 'center')->save($thumbnail . $fileName);
+        $image->withFile($filePath)->fit(150, 150, 'center')->save($thumbnail . $fileName);
 
-    //     // medium (500x500px) for product detail pages and add watermark
-    //     $medium = $uploadPath . 'medium/';
-    //     if (!is_dir($medium)) {
-    //         mkdir($medium, 0777, true);
-    //     }
-    //     $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
-    //         'color' => '#fff',
-    //         'opacity' => 0.8,
-    //         'withShadow' => true,
-    //         'hAlign' => 'center',
-    //         'vAlign' => 'top',
-    //         'fontSize' => 50,
-    //     ])->resize(500, 500, true, 'height')->save($medium . $fileName);
+        // medium (500x500px) for product detail pages and add watermark
+        $medium = $uploadPath . 'medium/';
+        if (!is_dir($medium)) {
+            mkdir($medium, 0777, true);
+        }
+        $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
+            'color' => '#fff',
+            'opacity' => 0.8,
+            'withShadow' => true,
+            'hAlign' => 'center',
+            'vAlign' => 'top',
+            'fontSize' => 50,
+        ])->resize(500, 500, true, 'height')->save($medium . $fileName);
 
-    //     // compress 80% quality and add watermark
-    //     $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
-    //         'color' => '#fff',
-    //         'opacity' => 0.8,
-    //         'withShadow' => true,
-    //         'hAlign' => 'center',
-    //         'vAlign' => 'top',
-    //         'fontSize' => 50,
-    //     ])->save($filePath, 80);
-    // }
+        // compress 80% quality and add watermark
+        $image->withFile($filePath)->text('Copyright 2025 E-Commerce System', [
+            'color' => '#fff',
+            'opacity' => 0.8,
+            'withShadow' => true,
+            'hAlign' => 'center',
+            'vAlign' => 'top',
+            'fontSize' => 50,
+        ])->save($filePath, 80);
+    }
 }

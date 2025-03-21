@@ -95,7 +95,7 @@ class M_Produk extends Model
 
     public function getProductJoinCategoriesImages()
     {
-        return $this->select('products.*, categories.name as category_name, product_images.image_path as image_path')
+        return $this->select('products.*, categories.name as category_name, product_images.image_path, product_images.id as product_images_id, product_images.is_primary')
             ->join('categories', 'categories.id = products.category_id')
             ->join('product_images', 'product_images.product_id = products.id', 'left')
             ->where('product_images.is_primary', 1);

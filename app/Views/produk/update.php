@@ -7,7 +7,7 @@
 <?= $this->section('content'); ?>
 <div class="bg-white shadow-sm rounded-lg p-6">
     <h1 class="text-2xl font-bold mb-6"><?= $title; ?></h1>
-    <form id="formData" action="<?= base_url('product-manager/products/' . $product->id . '/update'); ?>" method="post" novalidate>
+    <form id="formData" action="<?= base_url('product-manager/products/' . $product->id . '/update'); ?>" method="post" class="pristine-validate" enctype="multipart/form-data" novalidate>
         <?= csrf_field(); ?>
         <input type="hidden" name="_method" value="PUT">
 
@@ -100,6 +100,42 @@
         </div>
 
         <div class="mb-4">
+            <label for="image_path" class="block text-sm font-medium text-gray-700">Upload Image</label>
+            <?php if ($productImage->image_path): ?>
+                <div class="my-2">
+                    <img src="<?= base_url('uploads/product-images/' . $productImage->product_id . '/thumbnail/' . $productImage->image_path); ?>" alt="<?= $productImage->image_path; ?>" width="100" class="rounded-md">
+                </div>
+            <?php else: ?>
+                <p class="mt-1 text-sm text-gray-500">No image uploaded.</p>
+            <?php endif; ?>
+            <input
+                type="file"
+                name="image_path"
+                id="image_path"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                data-pristine-required
+                data-pristine-required-message="Please select a file to upload.">
+            <p class="mt-1 text-sm text-gray-500" id="file_input_help">Only JPG, PNG, WebP format (MAX. 5MB).</p>
+
+            <div id="file-type-error" class="text-xs text-red-800 text-xs font-medium mt-2" style="display: none;">
+                File must be in JPG, PNG, WebP format.
+            </div>
+
+            <div id="file-size-error" class="text-xs text-red-800 mt-2" style="display: none;">
+                File size must not exceed 5MB
+            </div>
+
+            <div id="preview-container" class="mb-4" src="#" alt="File Preview" style="display: none;">
+                Preview:
+                <iframe id="file-preview" class="w-sm h-48" frameborder="0"></iframe>
+            </div>
+
+            <div class="text-red-800 text-xs font-medium mt-2">
+                <?= session('errors.image_path') ?? ''; ?>
+            </div>
+        </div>
+
+        <div class="mb-4">
             <label for="is_new" class="block text-sm font-medium text-gray-700"> New</label>
             <select name="is_new" id="is_new" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 <option value="1" <?= $product->is_new === '1' ? 'selected' : ''; ?>>
@@ -146,6 +182,57 @@
             errorTextClass: 'text-red-800 text-xs font-medium mt-2'
         });
 
+        var fileInput = document.getElementById('image_path');
+        var fileTypeError = document.getElementById('file-type-error');
+        var fileSizeError = document.getElementById('file-size-error');
+        var previewContainer = document.getElementById('preview-container');
+        var filePreview = document.getElementById('file-preview');
+
+        var maxSize = 5 * 1024 * 1024;
+        var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        var allowedExtensions = ['.jpg', 'jpeg.', '.png', '.WebP'];
+
+        pristine.addValidator(fileInput, function(value) {
+            fileTypeError.style.display = 'none';
+            fileSizeError.style.display = 'none';
+            filePreview.style.display = 'none';
+
+            if (fileInput.files.length === 0) {
+                return true;
+            }
+
+            var file = fileInput.files[0]
+            var validType = allowedTypes.includes(file.type);
+
+            if (!validType) {
+                var fileName = file.name.toLowerCase();
+                validType = allowedExtensions.some(function(ext) {
+                    return fileName.endsWith(ext);
+                });
+            }
+
+            if (!validType) {
+                fileTypeError.style.display = 'block';
+                return false;
+            }
+
+            if (file.size > maxSize) {
+                fileSizeError.style.display = 'block';
+                return false;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                filePreview.src = e.target.result;
+                filePreview.style.display = 'block';
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+
+
+            return true;
+        }, "Validation is failed.", 5, false);
+
         form.addEventListener('submit', function(e) {
             var valid = pristine.validate();
             if (!valid) {
@@ -153,6 +240,13 @@
             }
         });
 
+        fileInput.addEventListener('change', function() {
+            fileTypeError.style.display = 'none';
+            fileSizeError.style.display = 'none';
+            filePreview.style.display = 'none';
+
+            pristine.validate(fileInput);
+        });
     };
 </script>
 <?= $this->endSection() ?>
