@@ -64,6 +64,16 @@ class Auth extends MythAuthController
         return redirect()->route('login')->with('message', lang('Auth.activationSuccess'));
     }
 
+    public function activateAccount()
+    {
+        return parent::activateAccount();
+    }
+
+    public function resendActivateAccount()
+    {
+        return parent::resendActivateAccount();
+    }
+
     private function redirectBasedOnRole()
     {
         $userId = user_id();

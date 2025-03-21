@@ -7,6 +7,14 @@
             Create an account
         </h1>
 
+        <div class="mb-4">
+            <?php if (session()->getFlashdata('error')) : ?>
+                <div class="bg-red-100 text-red-800 text-sm font-medium me-2 px-4 py-2 rounded-sm">
+                    <?= session()->getFlashdata('error'); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
         <form class="space-y-4 md:space-y-6" action="<?= route_to('register') ?>" method="post">
             <?= csrf_field(); ?>
 
@@ -20,7 +28,7 @@
                     </div>
                 <?php endif; ?>
             </div>
-            
+
             <div>
                 <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Your username</label>
                 <input type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" placeholder="<?= lang('Auth.username') ?>" value="<?= old('username') ?>">
