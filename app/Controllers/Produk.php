@@ -52,10 +52,12 @@ class Produk extends BaseController
     public function show($id = null)
     {
         $product = $this->produkModel->getProductJoinCategoriesImages()->find($id);
+        $images = $this->productImageModel->where('product_id', $id)->where('is_primary', 0)->findAll();
 
         $data = [
             'title' => 'Detail Product',
-            'product' => $product
+            'product' => $product,
+            'images' => $images
         ];
 
         return view('produk/detail', $data);
@@ -90,7 +92,7 @@ class Produk extends BaseController
 
         $this->sendEmail($addedProduct);
 
-        return redirect()->to('product-manager/products')->with('message', 'Product has been successfully added,  and a notification email has been sent.');;
+        return redirect()->to('product-manager/products')->with('message', 'Product has been successfully added,  and a notification email has been sent.');
     }
 
     public function edit($id = null)
@@ -120,7 +122,7 @@ class Produk extends BaseController
 
         $this->uploadProductImage($id);
 
-        return redirect()->to('product-manager/products');
+        return redirect()->to('product-manager/products')->with('message', 'Product has been successfully updated.');
     }
 
     public function delete($id = null)
@@ -226,8 +228,6 @@ class Produk extends BaseController
 
     private function uploadProductImage($product_id)
     {
-        $productImage = $this->productImageModel->where('product_id', $product_id)->first();
-
         $validationRules = [
             'imagePath' => [
                 'label' => 'Gambar',
@@ -276,21 +276,24 @@ class Produk extends BaseController
 
         $this->createImageVersions($filePath, $nameFile, $uploadPath);
 
-        if (!empty($productImage->is_primary)) {
-            $data = [
-                // 'id' => $productImage->id,
-                'product_id' => $product_id,
-                'image_path' => $nameFile,
-                'is_primary' => 0
-            ];
-        } else {
-            $data = [
-                'product_id' => $product_id,
-                'image_path' => $nameFile,
-                'is_primary' => 1
-            ];
-        }
+        $productImage = $this->productImageModel->where('product_id', $product_id)->first();
 
+        $data = [
+            'product_id' => $product_id,
+            'image_path' => $nameFile,
+        ];
+
+        // other image for store multiple images
+        if (!empty($productImage->is_primary)) {
+            $data['is_primary'] = 0;
+        } elseif (!empty($productImage->id)) {
+            // update image primary
+            $data['id'] = $productImage->id;
+            $data['is_primary'] = 1;
+        } else {
+            // create image primary
+            $data['is_primary'] = 1;
+        }
 
         if (!$this->productImageModel->save($data)) {
             return redirect()->to('product-manager/products/new')->withInput()->with('errors', $this->produkModel->errors());

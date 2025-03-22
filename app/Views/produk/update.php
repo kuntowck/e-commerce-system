@@ -101,7 +101,7 @@
 
         <div class="mb-4">
             <label for="image_path" class="block text-sm font-medium text-gray-700">Upload Image</label>
-            <?php if ($productImage->image_path): ?>
+            <?php if (isset($productImage->image_path)): ?>
                 <div class="my-2">
                     <img src="<?= base_url('uploads/product-images/' . $productImage->product_id . '/thumbnail/' . $productImage->image_path); ?>" alt="<?= $productImage->image_path; ?>" width="100" class="rounded-md">
                 </div>
@@ -125,7 +125,7 @@
                 File size must not exceed 5MB
             </div>
 
-            <div id="preview-container" class="mb-4" src="#" alt="File Preview" style="display: none;">
+            <div id="preview-container" class="mt-2 mb-4 text-sm text-gray-500" src="#" alt="File Preview" style="display: none;">
                 Preview:
                 <iframe id="file-preview" class="w-sm h-48" frameborder="0"></iframe>
             </div>
