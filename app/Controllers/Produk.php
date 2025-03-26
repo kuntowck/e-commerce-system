@@ -340,10 +340,12 @@ class Produk extends BaseController
     public function dashboard()
     {
         $productsByCategory = $this->getProductsByCategory();
+        $top5CategoriesOfProducts = $this->getTop5CategoriesOfProducts();
 
         return view('produk/dashboard', [
             'title' => 'Dashboard Products',
-            'productsByCategory' => json_encode($productsByCategory)
+            'productsByCategory' => json_encode($productsByCategory),
+            'top5CategoriesOfProducts' => json_encode($top5CategoriesOfProducts)
         ]);
     }
 
@@ -355,7 +357,6 @@ class Produk extends BaseController
             ->groupBy('categories.name')
             ->asArray()
             ->findAll();
-        d($productCategories);
 
         $bgColors = [];
         foreach ($productCategories as $row) {
@@ -376,6 +377,36 @@ class Produk extends BaseController
                     'data' => $productsPercentage,
                     'bgColor' => $colors,
                     'hoverOffset' => 4
+                ]
+            ]
+        ];
+    }
+
+    // bar chart
+    private function getTop5CategoriesOfProducts()
+    {
+        $productCategories = $this->produkModel->select('products.name as product_name, categories.name as category_name, count(products.category_id) as category_count')
+            ->join('categories', 'categories.id = products.category_id',)
+            ->groupBy('categories.name')
+            ->orderBy('category_count', 'DESC')
+            ->limit(5)
+            ->asArray()
+            ->findAll();
+
+        foreach ($productCategories as $row) {
+            $labels[] = 'Category: ' . $row['category_name'];
+            $categoryCount[] = (int) $row['category_count'];
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Products',
+                    'data' => $categoryCount,
+                    'bgColor' => 'rgba(54,162,235,0.5)',
+                    'borderColor' => 'rgb(54,162,235)',
+                    'borderWidth' => 1,
                 ]
             ]
         ];

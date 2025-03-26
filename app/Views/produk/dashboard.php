@@ -38,6 +38,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Bar Chart: Top 5 Categories with Most Products -->
+                <div class="">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="barChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -53,7 +65,9 @@
 <script>
     // Data dari controller
     const productsByCategory = <?= $productsByCategory ?>;
-    console.table(productsByCategory)
+    const top5CategoriesOfProducts = <?= $top5CategoriesOfProducts; ?>
+
+    console.table(productsByCategory, top5CategoriesOfProducts)
 
     const pieChart = new Chart(
         document.getElementById('pieChart'), {
@@ -69,6 +83,38 @@
                     },
                     legend: {
                         position: 'right'
+                    }
+                }
+            }
+        }
+    );
+
+    const barChart = new Chart(
+        document.getElementById('barChart'), {
+            type: 'bar',
+            data: top5CategoriesOfProducts,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Products'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Category'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Top 5 Categories with Most Products'
                     }
                 }
             }
