@@ -33,7 +33,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 });
 
 $routes->group('product-manager', ['filter' => 'role:product-manager'], function ($routes) {
-    $routes->get('dashboard', 'Home::dashboardProductManager');
+    $routes->get('dashboard', 'Produk::dashboard');
     $routes->get('/', function () {
         return redirect()->to('product-manager/dashboard');
     });
