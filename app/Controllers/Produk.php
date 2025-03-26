@@ -336,4 +336,48 @@ class Produk extends BaseController
             'fontSize' => 50,
         ])->save($filePath, 80);
     }
+
+    public function dashboard()
+    {
+        $productsByCategory = $this->getProductsByCategory();
+
+        return view('produk/dashboard', [
+            'title' => 'Dashboard Products',
+            'productsByCategory' => json_encode($productsByCategory)
+        ]);
+    }
+
+    // pie chart
+    private function getProductsByCategory()
+    {
+        $productCategories = $this->produkModel->select('products.name as product_name, count(products.category_id) as category_count, categories.name as category_name, (COUNT(products.category_id) * 100 / (SELECT COUNT(*) FROM products)) AS product_percentage')
+            ->join('categories', 'categories.id = products.category_id',)
+            ->groupBy('categories.name')
+            ->asArray()
+            ->findAll();
+        d($productCategories);
+
+        $bgColors = [];
+        foreach ($productCategories as $row) {
+            $bgColors[$row['category_name']] = "rgb(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ')";
+        }
+
+        foreach ($productCategories as $row) {
+            $categoryLabels[] = $row['product_name'] . ' = ' . $row['category_name'] . ' Category';
+            $productsPercentage[] = (int)round($row['product_percentage'], 2);
+            $colors[] = $bgColors[$row['category_name']];
+        }
+
+        return [
+            'labels' => $categoryLabels,
+            'datasets' => [
+                [
+                    'label' => 'Percentage of products by category',
+                    'data' => $productsPercentage,
+                    'bgColor' => $colors,
+                    'hoverOffset' => 4
+                ]
+            ]
+        ];
+    }
 }
