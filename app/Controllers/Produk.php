@@ -420,20 +420,48 @@ class Produk extends BaseController
     // line chart
     private function getProductGrowth()
     {
-        $products = $this->produkModel->select("DATE_FORMAT(created_at, '%m/%y') as month_year, COUNT(*) as total_products")
+        $products = $this->produkModel->select("DATE_FORMAT(created_at, '%M') as month, COUNT(*) as total_products")
             ->where('created_at >=', date('Y-m-d', strtotime('-12 months')))
-            ->groupBy('month_year')
-            ->orderBy('month_year', 'ASC')
+            ->groupBy('month')
+            ->orderBy('FIELD(month, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")')
             ->asArray()
             ->findAll();
 
-        foreach ($products as $row) {
-            $month_years[] = $row['month_year'];
-            $total_products[] = (int) $row['total_products'];
+        $defaultMonths = [
+            ['month' => 'January', 'total_products' => 0],
+            ['month' => 'February', 'total_products' => 0],
+            ['month' => 'March', 'total_products' => 0],
+            ['month' => 'April', 'total_products' => 0],
+            ['month' => 'May', 'total_products' => 0],
+            ['month' => 'June', 'total_products' => 0],
+            ['month' => 'July', 'total_products' => 0],
+            ['month' => 'August', 'total_products' => 0],
+            ['month' => 'September', 'total_products' => 0],
+            ['month' => 'October', 'total_products' => 0],
+            ['month' => 'November', 'total_products' => 0],
+            ['month' => 'December', 'total_products' => 0],
+        ];
+
+        // Gabungkan data $products dengan $defaultMonths
+        $mergedData = [];
+        foreach ($defaultMonths as $default) {
+            $found = array_filter($products, function ($product) use ($default) {
+                return $product['month'] === $default['month'];
+            });
+
+            if (!empty($found)) {
+                $mergedData[] = array_values($found)[0]; // Gunakan data dari $products jika ada
+            } else {
+                $mergedData[] = $default; // Gunakan data default jika tidak ada di $products
+            }
         }
 
+        // Pisahkan data untuk chart
+        $months = array_column($mergedData, 'month');
+        $total_products = array_column($mergedData, 'total_products');
+
         return [
-            'labels' => $month_years,
+            'labels' => $months,
             'datasets' => [
                 [
                     'label' => 'Month',
