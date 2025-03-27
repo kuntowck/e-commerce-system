@@ -28,6 +28,7 @@
 
         <div class="">
             <div class="">
+
                 <!-- Pie Chart: Product Category Distribution -->
                 <div class="">
                     <div class="card">
@@ -50,6 +51,17 @@
                     </div>
                 </div>
 
+                <!-- Line Chart: GPA per Semester -->
+                <div class="">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="lineChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -65,9 +77,10 @@
 <script>
     // Data dari controller
     const productsByCategory = <?= $productsByCategory ?>;
-    const top5CategoriesOfProducts = <?= $top5CategoriesOfProducts; ?>
+    const top5CategoriesOfProducts = <?= $top5CategoriesOfProducts; ?>;
+    const productGrowth = <?= $productGrowth; ?>;
 
-    console.table(productsByCategory, top5CategoriesOfProducts)
+    console.table(productGrowth);
 
     const pieChart = new Chart(
         document.getElementById('pieChart'), {
@@ -115,6 +128,47 @@
                     title: {
                         display: true,
                         text: 'Top 5 Categories with Most Products'
+                    }
+                }
+            }
+        }
+    );
+
+    const lineChart = new Chart(
+        document.getElementById('lineChart'), {
+            type: 'line',
+            data: productGrowth,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 4,
+                        title: {
+                            display: true,
+                            text: 'Total Products'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                },
+
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Product Growth'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Month: ${context.raw}`;
+                            }
+                        }
                     }
                 }
             }

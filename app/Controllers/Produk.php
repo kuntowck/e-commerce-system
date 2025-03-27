@@ -341,11 +341,13 @@ class Produk extends BaseController
     {
         $productsByCategory = $this->getProductsByCategory();
         $top5CategoriesOfProducts = $this->getTop5CategoriesOfProducts();
+        $productGrowth = $this->getProductGrowth();
 
         return view('produk/dashboard', [
             'title' => 'Dashboard Products',
             'productsByCategory' => json_encode($productsByCategory),
-            'top5CategoriesOfProducts' => json_encode($top5CategoriesOfProducts)
+            'top5CategoriesOfProducts' => json_encode($top5CategoriesOfProducts),
+            'productGrowth' => json_encode($productGrowth)
         ]);
     }
 
@@ -407,6 +409,35 @@ class Produk extends BaseController
                     'bgColor' => 'rgba(54,162,235,0.5)',
                     'borderColor' => 'rgb(54,162,235)',
                     'borderWidth' => 1,
+                ]
+            ]
+        ];
+    }
+
+    // line chart
+    private function getProductGrowth()
+    {
+        $products = $this->produkModel->select("DATE_FORMAT(created_at, '%m/%y') as month_year, COUNT(*) as total_products")
+            ->where('created_at >=', date('Y-m-d', strtotime('-12 months')))
+            ->groupBy('month_year')
+            ->orderBy('month_year', 'ASC')
+            ->asArray()
+            ->findAll();
+
+        foreach ($products as $row) {
+            $month_years[] = $row['month_year'];
+            $total_products[] = (int) $row['total_products'];
+        }
+
+        return [
+            'labels' => $month_years,
+            'datasets' => [
+                [
+                    'label' => 'month_year',
+                    'data' => $total_products,
+                    'borderColor' => 'rgba(75, 192, 192, 1)',
+                    'tension' => 0.1,
+                    'fill' => false
                 ]
             ]
         ];
