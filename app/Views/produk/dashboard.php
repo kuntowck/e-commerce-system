@@ -9,66 +9,61 @@
 <?php endif; ?>
 
 <?= $this->section('content'); ?>
-<div class="bg-white shadow-sm rounded-lg p-8">
+<div>
     <?php if (session('error')) :  ?>
-        <div class="bg-red-100 text-red-800 text-sm font-medium me-2 px-4 py-2 rounded-sm mb-2">
+        <div class="bg-red-100 text-red-800 text-center font-semibold me-2 px-4 py-2 rounded-full mb-4">
             <?= session('error') ?? ''; ?>
         </div>
     <?php elseif (session('message')): ?>
-        <div class="bg-green-100 text-green-800 text-sm font-medium me-2 px-4 py-2 rounded-sm mb-2">
+        <div class="bg-green-100 text-green-800 text-center font-semibold me-2 px-4 py-2 rounded-full mb-4">
             <?= session('message') ?? ''; ?>
         </div>
     <?php endif; ?>
+</div>
 
+<div class="grid grid-cols-2 gap-4">
     <?php if (!empty(user())): ?>
-        <h1 class="text-xl font-bold">Hello, <?= user()->username; ?>!</h1>
-        <?php foreach (user()->getRoles() as $role): ?>
-            <p>Role: <?= $role; ?></p>
-        <?php endforeach; ?>
-
-        <div class="">
-            <div class="">
-
-                <!-- Pie Chart: Product Category Distribution -->
-                <div class="">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="pieChart" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bar Chart: Top 5 Categories with Most Products -->
-                <div class="">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="barChart" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Line Chart: GPA per Semester -->
-                <div class="">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="lineChart" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+        <div class="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <div>
+                <h1 class="text-2xl font-bold mb-2">Hello, <?= user()->username; ?> 👋🏼</h1>
+                <?php foreach (user()->getRoles() as $role): ?>
+                    <span><?= view_cell('BadgeCell', ['text' => $role]); ?></span>
+                <?php endforeach; ?>
             </div>
         </div>
 
-    <?php else: ?>
-        <h1 class="text-xl font-bold mb-6">
-            Welcome to Student Management System
-        </h1>
+        <!-- Pie Chart: Product Category Distribution -->
+        <div class="bg-white p-4 rounded-lg shadow-sm">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="pieChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bar Chart: Top 5 Categories with Most Products -->
+        <div class="bg-white p-4 rounded-lg shadow-sm">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="barChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Chart: GPA per Semester -->
+        <div class="bg-white p-4 rounded-lg shadow-sm">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="lineChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     <?php endif; ?>
 </div>
 <?= $this->endSection(); ?>
@@ -153,7 +148,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Month'
+                            text: 'Months'
                         }
                     }
                 },
@@ -166,7 +161,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `Month: ${context.raw}`;
+                                return `Products: ${context.raw}`;
                             }
                         }
                     }

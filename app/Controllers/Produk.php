@@ -375,7 +375,7 @@ class Produk extends BaseController
             'labels' => $categoryLabels,
             'datasets' => [
                 [
-                    'label' => 'Percentage of products by category',
+                    'label' => 'Percentage of product',
                     'data' => $productsPercentage,
                     'bgColor' => $colors,
                     'hoverOffset' => 4
@@ -433,7 +433,7 @@ class Produk extends BaseController
             'labels' => $month_years,
             'datasets' => [
                 [
-                    'label' => 'month_year',
+                    'label' => 'Month',
                     'data' => $total_products,
                     'borderColor' => 'rgba(75, 192, 192, 1)',
                     'tension' => 0.1,
@@ -442,4 +442,6 @@ class Produk extends BaseController
             ]
         ];
     }
+
+    
 }
