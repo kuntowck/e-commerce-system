@@ -74,6 +74,8 @@ $routes->group('product-manager/products', ['filter' => 'role:product-manager,ad
     $routes->get('(:num)/edit', 'Produk::edit/$1');
     $routes->put('(:num)/update', 'Produk::update/$1');
     $routes->delete('(:num)/delete', 'Produk::delete/$1');
+    $routes->get('report', 'Produk::productReportForm');
+    $routes->get('report-excel', 'Produk::productReportExcel');
 });
 
 $routes->group('product-manager/orders', ['filter' => 'role:product-manager,admin'], function ($routes) {

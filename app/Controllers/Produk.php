@@ -8,6 +8,9 @@ use App\Libraries\DataParams;
 use App\Models\M_Category;
 use App\Models\M_ProductImage;
 use App\Models\M_User;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use \PhpOffice\PhpSpreadsheet\Style\Alignment as Alignment;
 
 class Produk extends BaseController
 {
@@ -443,5 +446,117 @@ class Produk extends BaseController
         ];
     }
 
-    
+    public function productReportForm()
+    {
+        $category_id = $this->request->getGet('category_id');
+
+        $categories = $this->categoryModel->findAll();
+        
+        $filteredData = $this->filterDataReport($category_id);
+
+        $data = [
+            'title' => 'Products Report',
+            'categories' => $categories,
+            'products' => $filteredData['products'],
+            'filters' => [
+                'category' => $filteredData['category'],
+            ]
+        ];
+
+        return view('produk/report_form', $data);
+    }
+
+    private function filterDataReport($category_id = '')
+    {
+        $products = $this->produkModel->getProductsByCategoryReport($category_id);
+
+        $category = '';
+
+        if (!empty($category_id)) {
+            foreach ($products as $data) {
+                if ($category_id === $data->category_id) {
+                    $category = $data->category_name ?? [];
+                }
+            }
+        }
+
+        return [
+            'products' => $products,
+            'category' => $category,
+        ];
+    }
+
+    public function productReportExcel()
+    {
+        $category_id = $this->request->getGet('category_id');
+
+        $results = $this->filterDataReport($category_id);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'Products Report');
+        $sheet->mergeCells('A1:J1');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getFont()->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A3', 'Filter:');
+        $sheet->setCellValue('B3', 'Category: ' . ($results['category'] ?? 'All'));
+        $sheet->getStyle('A3:B3')->getFont()->setBold(true);
+
+        $headers = [
+            'A5' => 'No.',
+            'B5' => 'Product Name',
+            'C5' => 'Category',
+            'D5' => 'Price',
+            'E5' => 'Stock',
+            'F5' => 'Date Added'
+        ];
+
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
+            $sheet->getStyle($cell)->getFont()->setBold(true);
+            $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+
+        $row = 6;
+        $no = 1;
+        foreach ($results['products'] as $product) {
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValue('B' . $row, $product->name);
+            $sheet->setCellValue('C' . $row, $product->category_name);
+            $sheet->setCellValue('D' . $row, $product->getFormattedPrice());
+            $sheet->setCellValue('E' . $row, $product->stock);
+            $sheet->setCellValue('F' . $row, $product->created_at);
+
+            $row++;
+            $no++;
+        }
+
+        foreach (range('A', 'F') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        // Buat border untuk seluruh tabel
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+        ];
+
+        $sheet->getStyle('A5:F' . ($row - 1))->applyFromArray($styleArray);
+
+        $filename = 'Products_Report_' . date('Y-m-d-His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit();
+    }
 }

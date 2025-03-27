@@ -165,4 +165,15 @@ class M_Produk extends Model
         return $this->select('products.*, categories.name as category_name')
             ->join('categories', 'categories.id = products.category_id',);
     }
+
+    public function getProductsByCategoryReport($category_id = '')
+    {
+        $products = $this->getProductJoinCategories();
+
+        if (!empty($category_id)) {
+            $products->where('products.category_id', $category_id);
+        }
+
+        return $products->findAll();
+    }
 }
