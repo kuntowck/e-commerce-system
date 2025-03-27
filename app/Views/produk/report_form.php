@@ -18,7 +18,7 @@
                 <select name="category_id" class="form-select mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="this.form.submit()">
                     <option value="">All Category</option>
                     <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category->id; ?>" <?= ($filters['category'] === $category->name) ? 'selected' : ''; ?>>
+                        <option value="<?= $category->id; ?>" <?= ($filter['category_id'] ?? '' == $category->id) ? 'selected' : ''; ?>>
                             <?= ucfirst($category->name); ?>
                         </option>
                     <?php endforeach; ?>
@@ -32,10 +32,11 @@
     </form>
 
     <div class="mb-4">
-        <div>
-            <a href="<?= site_url('product-manager/products/report-excel'); ?>" class="px-4 py-2 bg-green-100 text-green-700 border border-green-200 font-semibold text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:bg-green-700 focus:ring-green-500 focus:ring-offset-2 text-center cursor-pointer">Export Excel</a>
-        </div>
+        <form action="<?= site_url('product-manager/products/report-excel'); ?>" method="get">
+            <input type="hidden" name="category_id" value="<?= $filter['category_id'] ?? ''; ?>">
 
+            <button type="submit" class="px-4 py-2 bg-green-100 text-green-700 border border-green-200 font-semibold text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:bg-green-700 focus:ring-green-500 focus:ring-offset-2 text-center cursor-pointer">Export Excel</button>
+        </form>
     </div>
 
     <div class="overflow-x-auto mt-6">

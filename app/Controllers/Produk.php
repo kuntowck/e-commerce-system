@@ -451,17 +451,17 @@ class Produk extends BaseController
         $category_id = $this->request->getGet('category_id');
 
         $categories = $this->categoryModel->findAll();
-        
+
         $filteredData = $this->filterDataReport($category_id);
 
         $data = [
             'title' => 'Products Report',
             'categories' => $categories,
             'products' => $filteredData['products'],
-            'filters' => [
-                'category' => $filteredData['category'],
-            ]
+            'filter' => $filteredData['category'],
         ];
+
+        // dd($filteredData, $data);
 
         return view('produk/report_form', $data);
     }
@@ -470,15 +470,17 @@ class Produk extends BaseController
     {
         $products = $this->produkModel->getProductsByCategoryReport($category_id);
 
-        $category = '';
-
+        $category = [];
         if (!empty($category_id)) {
             foreach ($products as $data) {
                 if ($category_id === $data->category_id) {
-                    $category = $data->category_name ?? [];
+                    $category['category_id'] = $data->category_id ?? [];
+                    $category['category_name'] = $data->category_name ?? [];
+                    break;
                 }
             }
         }
+        // dd($category);
 
         return [
             'products' => $products,
@@ -496,13 +498,13 @@ class Produk extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setCellValue('A1', 'Products Report');
-        $sheet->mergeCells('A1:J1');
+        $sheet->mergeCells('A1:F1');
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getFont()->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue('A3', 'Filter:');
-        $sheet->setCellValue('B3', 'Category: ' . ($results['category'] ?? 'All'));
+        $sheet->setCellValue('B3', 'Category: ' . ($results['category']['category_name'] ?? 'All'));
         $sheet->getStyle('A3:B3')->getFont()->setBold(true);
 
         $headers = [
@@ -526,7 +528,8 @@ class Produk extends BaseController
             $sheet->setCellValue('A' . $row, $no);
             $sheet->setCellValue('B' . $row, $product->name);
             $sheet->setCellValue('C' . $row, $product->category_name);
-            $sheet->setCellValue('D' . $row, $product->getFormattedPrice());
+            $sheet->setCellValue('D' . $row, $product->price);
+            $sheet->getStyle('C' . $row)->getNumberFormat()->setFormatCode('"Rp" #,##0.00');
             $sheet->setCellValue('E' . $row, $product->stock);
             $sheet->setCellValue('F' . $row, $product->created_at);
 
