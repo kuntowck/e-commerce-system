@@ -54,6 +54,8 @@ $routes->group('admin/users', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('update/(:num)', 'User::edit/$1');
     $routes->put('update/(:num)', 'User::update/$1');
     $routes->delete('delete/(:num)', 'User::delete/$1');
+    $routes->get('report', 'User::userReportForm');
+    $routes->post('report-pdf', 'User::userReportPDF');
 });
 
 $routes->group('admin/roles', ['filter' => 'role:admin'], function ($routes) {

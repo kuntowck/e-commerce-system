@@ -41,7 +41,7 @@
                 <select name="role" class="form-select mt-1 block w-full px-3 py-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="this.form.submit()">
                     <option value="">All Roles</option>
                     <?php foreach ($roles as $role): ?>
-                        <option value="<?= $role->id; ?>" <?= $params->role === $role ? 'selected' : ''; ?>>
+                        <option value="<?= $role->id; ?>" <?= $params->role === $role->id ? 'selected' : ''; ?>>
                             <?= ucfirst($role->name); ?>
                         </option>
                     <?php endforeach; ?>

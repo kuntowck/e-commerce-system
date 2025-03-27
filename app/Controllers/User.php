@@ -3,9 +3,9 @@
 namespace App\Controllers;
 
 use App\Models\M_User;
-use App\Entities\User as UserEntity;
 use App\Libraries\DataParams;
 use Myth\Auth\Models\GroupModel;
+use TCPDF;
 
 class User extends BaseController
 {
@@ -231,5 +231,125 @@ class User extends BaseController
     public function settings($setting)
     {
         return view('user/settings', ['data' => $setting]);
+    }
+
+    public function userReportForm()
+    {
+        $roles = $this->groupModel->findAll();
+        $users = $this->userModel->findAll();
+
+        $data = [
+            'title' => 'Users Report',
+            'roles' => $roles,
+            'users' => $users
+        ];
+
+        return view('user/report_form', $data);
+    }
+
+    public function userReportPDF()
+    {
+        $role = $this->request->getVar('role');
+
+        $users = $this->userModel->getUserGroupReport($role);
+
+        if (!empty($role)) {
+            foreach ($users as $user) {
+                if ($role === $user->group_id) {
+                    $role = 'Users Data by Role: ' . ucfirst($user->group_name);
+                }
+            }
+        }
+
+        // Generate PDF
+        $pdf = $this->initTcpdf($role);
+        $this->generatePdfContent($pdf, $users, $role);
+
+        // Output PDF
+        $filename = 'Users_report_' . date('Y-m-d') . '.pdf';
+        $pdf->Output($filename, 'I');
+        exit;
+    }
+
+    private function initTcpdf()
+    {
+        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+
+        $pdf->SetCreator('CodeIgniter 4');
+        $pdf->SetAuthor('Administrator');
+        $pdf->SetTitle('Users Report');
+        $pdf->SetSubject('Users Data Report');
+
+        $logoPath = 'assets/img/logo.png';
+        $pdf->SetHeaderData(
+            $logoPath,
+            10,
+            'E-Commerce',
+            '',
+            [0, 0, 0],
+            [0, 64, 128]
+        );
+        $pdf->setFooterData([0, 64, 0], [0, 64, 128]);
+
+        $pdf->setHeaderFont(['helvetica', '', 12]);
+        $pdf->setFooterFont(['helvetica', '', 8]);
+
+        $pdf->SetMargins(15, 20, 15);
+        $pdf->SetHeaderMargin(5);
+        $pdf->SetFooterMargin(10);
+
+        $pdf->SetAutoPageBreak(true, 25);
+
+        $pdf->SetFont('helvetica', '', 10);
+
+        $pdf->AddPage();
+
+        return $pdf;
+    }
+
+    private function generatePdfContent($pdf, $users, $role)
+    {
+        $titleReports = 'USERS DATA REPORTS';
+        $subjectReports =  $role ?? '';
+
+        $html = '<h2 style="text-align:center;">' . $titleReports . '</h2>
+                <h4 style="text-align:center;">' . $subjectReports . '</h2>
+        
+                <p style="margin-top:30px; text-align:right;">    
+                    Print Date: ' . date('d-m-Y H:i:s') . '<br> 
+                </p>' .
+
+            '<table border="1" cellpadding="5" cellspacing="0" style="width:100%;">
+                    <thead>
+                    <tr style="background-color:#CCCCCC; font-weight:bold; text-align:center;">
+                        <th>No</th>
+                        <th>Full Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Registration Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>';
+
+        $no = 1;
+        foreach ($users as $data) {
+            $html .= '
+                    <tr>
+                        <td style="text-align:center;">' . $no++ . '</td>
+                        <td>' . $data->full_name . '</td>
+                        <td>' . $data->username . '</td>
+                        <td>' . $data->email . '</td>
+                        <td>' . $data->created_at . '</td>
+                    </tr>';
+        }
+
+        $html .= '
+                    </tbody>
+                </table>
+           
+                <p style="margin-top:30px; text-align:left;">      
+                    Total Users: ' . count($users) . ' 
+                </p>';
+        $pdf->writeHTML($html, true, false, true, false, '');
     }
 }

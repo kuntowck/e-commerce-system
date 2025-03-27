@@ -152,4 +152,17 @@ class M_User extends MythModel
 
         return array_column($statuses, 'status');
     }
+
+    public function getUserGroupReport($role_id = '')
+    {
+        $users = $this->select('users.id, email, username, full_name, created_at, auth_groups_users.group_id, auth_groups.name as group_name')
+            ->join('auth_groups_users', 'auth_groups_users.user_id = users.id', 'left')
+            ->join('auth_groups', 'auth_groups.id = auth_groups_users.group_id', 'left');
+
+        if (!empty($role_id)) {
+            $users->where('group_id', $role_id);
+        }
+
+        return $users->findAll();
+    }
 }
